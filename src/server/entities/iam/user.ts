@@ -1,5 +1,5 @@
 export interface IUser {
-  steam_username: string
+  steam_username?: string
   user__id: string
   username: string
   rating: number
@@ -7,7 +7,7 @@ export interface IUser {
 }
 
 export class User implements IUser {
-  public steam_username: string
+  public steam_username?: string
   public user__id: string
   public username: string
   public rating: number

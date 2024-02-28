@@ -1,0 +1,40 @@
+.formContainer {
+    width: 300px;
+    max-width: 90%;
+    border: 1px solid #4d4a49;
+    margin: 5em auto 0;
+    border-radius: 10px;
+}
+
+.form {
+    padding: 1em 2em;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    font-size: 21px;
+}
+
+.form button {
+    font-size: inherit;
+}
+
+.form label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form input {
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #4d4a49;
+    background: none;
+    font-size: inherit;
+}
+
+.form input:focus {
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #80706b;
+    background: none;
+}

@@ -1,9 +1,14 @@
-import { type NextRequest } from 'next/server'
+import {type NextRequest, NextResponse} from 'next/server'
+import {UserRepository} from "@/server/repositories/iam/user_repository";
 
-export function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const query = searchParams.get('query')
-  // query is "hello" for /api/search?query=hello
-  // return Response.json({ product })
-
+export async function GET(request: NextRequest) {
+  return UserRepository.getAllUsers()
+    .then((userList) => {
+      return Response.json({
+        data: userList.map(user => user.toJson())
+      })
+    })
+    .catch((error: Error) => {
+      return NextResponse.json({error: error.message}, {status: 500})
+    })
 }
