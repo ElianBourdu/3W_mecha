@@ -15,13 +15,17 @@ export class UserRepository {
     })
   }
 
-  public static async getUserByUsername(username: string, includePassword = false): Promise<User> {
+  public static async getUserByUsername(username: string, includePassword = false, isThrowing = true): Promise<User> {
     return getPool().query<IUser>(
       `SELECT user__id, username, steam_username, rating, password FROM iam.user WHERE username = $1`,
       [username])
       .then((res) => {
         if (res.rows.length === 0) {
-          throw new EntityNotFoundException('User', { username })
+          if (isThrowing) {
+            throw new EntityNotFoundException('User', { username })
+          } else {
+            return null
+          }
         }
 
         if (!includePassword) {
@@ -37,6 +41,7 @@ export class UserRepository {
    * @param userId string the ID of the user
    * @throws EntityNotFoundException
    */
+
   public static async getUserById(userId: string): Promise<User> {
     return getPool().query<IUser>(
       `SELECT user__id, username, steam_username, rating FROM iam.user WHERE user__id = $1`,

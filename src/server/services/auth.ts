@@ -3,7 +3,7 @@ import { sign } from 'jsonwebtoken'
 import assert from 'assert'
 import {PasswordNotMatchingException} from "@/server/errors/password_not_matching";
 
-const SALT_ROUND = process.env.SALT_ROUND ?? 10
+const SALT_ROUND = +process.env.SALT_ROUND ?? 10
 const JWT_SECRET = process.env.JWT_SECRET
 
 assert(JWT_SECRET)

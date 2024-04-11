@@ -8,14 +8,15 @@ import {PasswordNotMatchingException} from "@/server/errors/password_not_matchin
 export async function POST(request: NextRequest) {
   const bodyPayload = await request.json()
   const username = bodyPayload.username
-  const input_password = bodyPayload.password
+  const password = bodyPayload.password
 
   return UserRepository.getUserByUsername(username, true)
-    .then(async ({ password, username, user__id, steam_username }) => {
-      return isPasswordMatchingHash(input_password, password)
+    .then(async ({ password: password_hash, username, user__id, steam_username }) => {
+      return isPasswordMatchingHash(password, password_hash)
         .then(() => createJWT({username, user__id, steam_username}))
         .then(token => {
-          cookies().set('token', token, { httpOnly: true })
+          cookies().set('mechaToken', token, { httpOnly: true })
+          return NextResponse.json({data: null}, { status: 200 })
         })
     })
     .catch((error) => {
