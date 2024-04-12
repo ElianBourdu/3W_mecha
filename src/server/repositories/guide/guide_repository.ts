@@ -6,9 +6,17 @@ export class GuideRepository {
   // avoid any construction of the class, every method will be static
   private constructor() {}
 
-  public static async getAllGuides(): Promise<Guide[]> {
+  public static async getAllGuides(filter = ''): Promise<Guide[]> {
+    if (filter.trim().length === 0) {
+      return getPool().query<IGuide>(
+        `SELECT guide__id, user__id, title, content FROM guide.guide`
+      ).then(guideList => {
+        return guideList.rows.map(guide => Guide.fromObject(guide))
+      })
+    }
+
     return getPool().query<IGuide>(
-      `SELECT guide__id, user__id, title, content FROM guide.guide`
+      `SELECT guide__id, user__id, title, content FROM guide.guide WHERE title LIKE '%${filter}%'`
     ).then(guideList => {
       return guideList.rows.map(guide => Guide.fromObject(guide))
     })

@@ -3,6 +3,7 @@ import {NextRequest, NextResponse} from "next/server";
 import Joi from "joi";
 import {EntityAlreadyExists} from "@/server/errors/entity_already_exists";
 import {getUserFromToken} from "@/server/services/auth";
+import {UserRepository} from "@/server/repositories/iam/user_repository";
 
 // définition du schema Joi pour une première validation des données
 // issues du payload de la requête POST
@@ -18,12 +19,27 @@ const schema = Joi.object({
 })
 
 // get all guides
-export async function GET() {
+// récupération des utilisateurs si ?include=user est spécifié, sinon on retourne juste les guides
+export async function GET(request: NextRequest) {
+  const includes = request.nextUrl.searchParams.getAll('includes') ?? []
+  const titleFilter = request.nextUrl.searchParams.get('title') ?? ''
+
+
+
   return GuideRepository.getAllGuides()
-    .then(guideList => {
-      return Response.json({
-        data: guideList.map(guide => guide.toJson())
-      })
+    .then(guides => {
+      return Promise.all(guides.map(async guide => {
+        if (includes.includes('user')) {
+          return UserRepository.getUserById(guide.user__id).then(user => {
+            guide.user = user
+            return guide.toJson()
+          })
+        }
+        return Promise.resolve(guide.toJson())
+      }))
+    })
+    .then(guides => {
+      return Response.json({ data: guides }, { status: 200 })
     })
     .catch((error: Error) => {
       return NextResponse.json({ error: error.message }, { status: 500 })
