@@ -22,11 +22,9 @@ const schema = Joi.object({
 // récupération des utilisateurs si ?include=user est spécifié, sinon on retourne juste les guides
 export async function GET(request: NextRequest) {
   const includes = request.nextUrl.searchParams.getAll('includes') ?? []
-  const titleFilter = request.nextUrl.searchParams.get('title') ?? ''
+  const titleFilter = request.nextUrl.searchParams.get('title') ?? null
 
-
-
-  return GuideRepository.getAllGuides()
+  return GuideRepository.getAllGuides({ title: titleFilter })
     .then(guides => {
       return Promise.all(guides.map(async guide => {
         if (includes.includes('user')) {
