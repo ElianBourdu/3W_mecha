@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import {UserRepository} from "@/server/repositories/iam/user_repository";
 import {EntityNotFoundException} from "@/server/errors/not_found";
 import {GuideRepository} from "@/server/repositories/guide/guide_repository";
 

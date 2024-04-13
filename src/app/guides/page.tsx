@@ -13,7 +13,6 @@ type GuideWithUser = IGuide & { user: IUser }
 export default function Guides() {
   const [guides, setGuides] = useState<GuideWithUser[]>([])
   const handleChange = (inputValue: string) => {
-    console.log('test')
     getGuides({ title: inputValue }).then(guides => setGuides(guides))
   }
 
