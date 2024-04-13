@@ -3,6 +3,7 @@
 import Wysiywg from "@/components/wysiywg";
 import {useState} from "react";
 import { useRouter } from 'next/navigation'
+import styles from './page.module.css'
 
 async function createGuide(title: string, content: string) {
   return fetch('/api/guides', {
@@ -39,19 +40,29 @@ export default function CreateGuide() {
 
   return (
     <>
-      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <Wysiywg
-        placeholder="Rédigez votre guide ici..."
-        onChange={(value) => setContent(value)}
-      />
-      <button onClick={create}>
-        Créer le guide
-      </button>
-      { message.length > 0 &&
-        <i>
-          {message}
-        </i>
-      }
+      <div className={styles.container}>
+        <input
+          className={styles.title_input}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={"Titre du guide"}
+        />
+        <Wysiywg
+          placeholder="Rédigez votre guide ici..."
+          onChange={(value) => setContent(value)}
+        />
+        <div className={styles.submit_container}>
+          { message.length > 0 &&
+            <i>
+              {message}
+            </i>
+          }
+          <button className={styles.submit_button} onClick={create}>
+            Créer le guide
+          </button>
+        </div>
+      </div>
     </>
   )
 }

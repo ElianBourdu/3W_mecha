@@ -5,9 +5,11 @@ export default function Wysiywg({ placeholder, onChange }: { placeholder: string
   const editor = useRef(null);
   const [content, setContent] = useState('');
 
+  // all options from https://xdsoft.net/jodit/docs/
   const config = {
-    readonly: false, // all options from https://xdsoft.net/jodit/docs/,
-    placeholder: placeholder || 'Start typings...',
+    readonly: false,
+    placeholder: placeholder,
+    disablePlugins: "about,add-new-line,ai-assistant,backspace,class-span,clean-html,clipboard,copyformat,drag-and-drop-element,drag-and-drop,file,dtd,iframe,image,image-processor,image-properties,video,resizer,search,print,source,speech-recognize,spellcheck,stat,fullsize,symbols",
   }
 
   return (
@@ -15,8 +17,7 @@ export default function Wysiywg({ placeholder, onChange }: { placeholder: string
       ref={editor}
       value={content}
       config={config}
-      onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-      onChange={onChange}
+      onBlur={onChange} // preferred to use only this option to update the content for performance reasons
     />
   );
 };
