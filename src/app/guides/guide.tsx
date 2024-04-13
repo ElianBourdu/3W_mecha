@@ -10,7 +10,6 @@ export default function Guide({ guide }: {guide: GuideWithUser}) {
       <h2 className={styles.title}>{ guide.title }</h2>
       <p className={styles.wrote_by}>Guide rédigé par { guide.user.username }</p>
       <p className={styles.content}>{ guide.content }</p>
-      <a className={styles.link} href="#"></a>
     </a>
   )
 }

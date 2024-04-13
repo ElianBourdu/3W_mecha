@@ -1,12 +1,5 @@
-import {IGuide} from "@/server/entities/guide/guide";
 import styles from "./page.module.css";
-import {IUser} from "@/server/entities/iam/user";
-
-async function getGuideByTitle(title: string): Promise<IGuide & { user: IUser }> {
-  return fetch(`http://localhost:3000/api/guides/${title}?includes=user`)
-    .then(res => res.json())
-    .then(json => json.data)
-}
+import {getGuideByTitle} from "@/lib/getGuides";
 
 export default async function GuideByTitle({ params }: {params: {title: string}}) {
   const guide = await getGuideByTitle(params.title)

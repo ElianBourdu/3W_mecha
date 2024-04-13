@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import {EntityNotFoundException} from "@/server/errors/not_found";
 import {GuideRepository} from "@/server/repositories/guide/guide_repository";
+import {UserRepository} from "@/server/repositories/iam/user_repository";
 
 export async function GET(request: NextRequest, { params }: { params: { title: string } }) {
   const includes = request.nextUrl.searchParams.getAll('includes') ?? []
