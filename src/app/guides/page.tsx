@@ -6,6 +6,7 @@ import {IUser} from "@/server/entities/iam/user";
 import SearchBar from "@/components/searchBar";
 import {getGuides} from "@/lib/getGuides";
 import {useEffect, useState} from "react";
+import styles from "./page.module.css";
 
 type GuideWithUser = IGuide & { user: IUser }
 
@@ -22,10 +23,10 @@ export default function Guides() {
 
   return (
     <>
-      <div>
-        <SearchBar onChange={handleChange} />
+      <div className={styles.searchBar}>
+        <SearchBar placeholder="Rechercher un guide !" onChange={handleChange} />
       </div>
-      <div>
+      <div className={styles.guides}>
         { guides.map(guide => {
           return (
             <Guide guide={guide} key={guide.guide__id}/>

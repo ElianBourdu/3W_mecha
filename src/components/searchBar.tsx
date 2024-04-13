@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 
-export default function SearchBar(props: { onChange: (value: string) => void }) {
+export default function SearchBar(props: { onChange: (value: string) => void, placeholder: string}) {
   const [searchInputValue, setSearchInputValue] = useState('')
   const handleChange = (e) => {
     setSearchInputValue(e.target.value)
@@ -11,7 +11,7 @@ export default function SearchBar(props: { onChange: (value: string) => void }) 
 
   return (
     <>
-      <input type="text" value={searchInputValue} onChange={handleChange}/>
+      <input type="text" value={searchInputValue} onChange={handleChange} placeholder={props.placeholder}/>
     </>
   )
 }
