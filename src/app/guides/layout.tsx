@@ -1,17 +1,19 @@
-import { Inter } from "next/font/google";
-import "@/app/globals.css";
+import React from "react";
+import {Metadata} from "next";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata = {
+export const metadata: Metadata = {
   title: "Guides !",
   description: "des super guides pour super mecha",
 };
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="fr">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <div>
+      {children}
+    </div>
   );
 }
