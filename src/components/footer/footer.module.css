@@ -1,0 +1,7 @@
+.footer {
+    display: flex;
+    background: var(--primary-500);
+    padding: 1rem;
+    justify-content: right;
+    gap: 2rem;
+}

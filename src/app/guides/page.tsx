@@ -24,7 +24,7 @@ export default function Guides() {
 
   return (
     <>
-      <div className={styles.searchBar}>
+      <div className={styles.headWrapper}>
         <Input placeholder="Rechercher un guide !" onChange={handleChange} />
         { !!user &&
           <Button cta href="/guides/nouveau">Créer un guide</Button>
