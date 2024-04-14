@@ -1,7 +1,9 @@
-import { cookies} from "next/headers";
-import {atob} from "node:buffer";
+'use server'
 
-export function getUser(): {username: string, user__id: string, steam_username: string} {
+import {IUser} from "@/server/entities/iam/user";
+import {cookies} from "next/headers";
+
+export async function getUser(): Promise<IUser> {
   const cookieStore = cookies()
   const mechaToken = cookieStore.get('mechaToken')
   if (!mechaToken) {

@@ -3,9 +3,8 @@
 import {IGuide} from "@/server/entities/guide/guide";
 import {IUser} from "@/server/entities/iam/user";
 
-export type GuideWithUser = IGuide & { user: IUser }
 
-export async function getGuides(params: any = {}): Promise<GuideWithUser[]> {
+export async function getGuides(params: any = {}): Promise<IGuide[]> {
   const urlParams = {
     includes: 'user',
     ...params
@@ -21,7 +20,7 @@ export async function getGuides(params: any = {}): Promise<GuideWithUser[]> {
     .then(json => json.data)
 }
 
-export async function getGuideByTitle(title: string): Promise<IGuide & { user: IUser }> {
+export async function getGuideByTitle(title: string): Promise<IGuide> {
   return fetch(`http://localhost:3000/api/guides/${title}?includes=user`)
     .then(res => res.json())
     .then(json => json.data)

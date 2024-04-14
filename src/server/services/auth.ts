@@ -2,6 +2,7 @@ import { hash, compare } from 'bcryptjs'
 import { sign, verify } from 'jsonwebtoken'
 import {PasswordNotMatchingException} from "@/server/errors/password_not_matching";
 import {NextResponse} from "next/server";
+import {IUser} from "@/server/entities/iam/user";
 
 const SALT_ROUND = +process.env.SALT_ROUND ?? 10
 const JWT_SECRET = process.env.JWT_SECRET
@@ -40,7 +41,7 @@ export async function verifyJWT(token: string): Promise<Record<string, any>> {
   })
 }
 
-export async function getUserFromToken(token: string): Promise<Record<string, any>|null> {
+export async function getUserFromToken(token: string): Promise<IUser|null> {
   // si le token n'est pas présent, on renvoie une erreur 401
   if (!token) {
     return null
