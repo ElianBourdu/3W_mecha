@@ -23,7 +23,7 @@ const schema = Joi.object({
 export async function GET(request: NextRequest) {
   const page = +(request.nextUrl.searchParams.get('page') ?? 1)
   const limit = +(request.nextUrl.searchParams.get('limit') ?? 10)
-  const includeClosed = !!(request.nextUrl.searchParams.get('includeClosed') ?? false)
+  const includeClosed = !!(request.nextUrl.searchParams.get('include_closed') ?? false)
 
   return TournamentRepository.getAllTournaments(limit, (page - 1) * limit, includeClosed)
     .then((tournamentList) => {

@@ -1,3 +1,5 @@
+import {IUser, User} from "@/server/entities/iam/user";
+
 export interface IRound {
   round__id: string
   tournament__id: string
@@ -5,10 +7,12 @@ export interface IRound {
   start_at: Date
   first_player__id: string
   first_player_checkin: Date
-  first_player_result: number
+  first_player_result: boolean
   second_player__id: string
   second_player_checkin: Date
-  second_player_result: number
+  second_player_result: boolean
+  first_player?: IUser
+  second_player?: IUser
 }
 
 export class Round implements IRound {
@@ -18,10 +22,13 @@ export class Round implements IRound {
   public start_at: Date
   public first_player__id: string
   public first_player_checkin: Date
-  public first_player_result: number
+  public first_player_result: boolean
   public second_player__id: string
   public second_player_checkin: Date
-  public second_player_result: number
+  public second_player_result: boolean
+
+  public first_player?: User
+  public second_player?: User
 
   public static fromObject(object: IRound): Round {
     const round = new Round()
@@ -38,7 +45,7 @@ export class Round implements IRound {
     return round
   }
 
-  public toJson(): Record<string, string | number> {
+  public toJson(): Record<string, string | number | boolean> {
     return {
       round__id: this.round__id,
       tournament__id: this.tournament__id,

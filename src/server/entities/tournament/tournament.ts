@@ -1,4 +1,4 @@
-import {User} from "@/server/entities/iam/user";
+import {IUser, User} from "@/server/entities/iam/user";
 
 export interface ITournament {
   tournament__id: string
@@ -6,6 +6,8 @@ export interface ITournament {
   name: string
   start_at: Date
   max_players: number
+  player_count?: number
+  user?: IUser
 }
 
 export class Tournament implements ITournament {
@@ -15,6 +17,7 @@ export class Tournament implements ITournament {
   public start_at: Date
   public max_players: number
 
+  public player_count?: number
   public user?: User
 
   public static fromObject(object: ITournament): Tournament {
@@ -33,7 +36,9 @@ export class Tournament implements ITournament {
       owner__id: this.owner__id,
       name: this.name,
       start_at: this.start_at.toISOString(),
-      ...(this.user ? { user: this.user.toJson() } : {})
+      max_players: this.max_players,
+      ...(this.user ? { user: this.user.toJson() } : {}),
+      ...(this.player_count ? { player_count: this.player_count } : {})
     }
   }
 }

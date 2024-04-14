@@ -7,7 +7,11 @@ import {createTournament} from "@/lib/createTournament";
 import {convertToDateTimeLocalString} from "@/lib/date";
 
 // Pour calculer la durée moyenne d'un tournoi, une manche dure 20 minutes en moyenne
-const ROUND_AVERAGE_DURATION = 1000 * 60 * 20
+const ROUND_AVERAGE_DURATION = 20
+
+function getMaxRounds(maxPlayers: number): number {
+  return Math.ceil(Math.log2(maxPlayers))
+}
 
 export default function CreateGuide() {
   const [name, setName] = useState<string>('')
@@ -68,7 +72,10 @@ export default function CreateGuide() {
           le tournoi commencera le {start_at.toLocaleDateString()} à {start_at.toLocaleTimeString()}
         </i>
         <i>
-          Il durera environ {Math.ceil(max_players / 2) * ROUND_AVERAGE_DURATION} minutes si la capacité maximale est
+          {getMaxRounds(max_players)} manches seront nécessaires pour déterminer le vainqueur
+        </i>
+        <i>
+          Il durera environ {getMaxRounds(max_players) * ROUND_AVERAGE_DURATION} minutes si la capacité maximale est
           atteinte
         </i>
         <button type="submit" className={styles.submit_button}>

@@ -3,6 +3,7 @@ import { EntityNotFoundException } from "@/server/errors/not_found";
 import {ITournament, Tournament} from "@/server/entities/tournament/tournament";
 import {IUser} from "@/server/entities/iam/user";
 import {User} from "@/server/entities/iam/user";
+import {EntityAlreadyExists} from "@/server/errors/entity_already_exists";
 
 export class TournamentRepository {
   // avoid any construction of the class, every method will be static
@@ -16,7 +17,7 @@ export class TournamentRepository {
   public static async getTournamentById(tournamentId: string): Promise<Tournament> {
     return getPool().query<ITournament & IUser>(
       `
-        SELECT tournament__id, owner__id, name, start_at, user__id, username, steam_username, rating, password
+        SELECT tournament__id, owner__id, max_players, name, start_at, user__id, username, steam_username, rating, password
         FROM tournament.tournament
             JOIN iam."user" u ON tournament.owner__id = u.user__id
         WHERE tournament__id = $1
@@ -34,18 +35,71 @@ export class TournamentRepository {
       })
   }
 
+  public static async getTournamentPlayerCount(tournamentId: string): Promise<number> {
+    return getPool().query<{ count: number }>(
+      `
+        SELECT count(*) as count
+        FROM tournament.user__tournament tournament_player
+            JOIN iam."user" u ON tournament_player.user__id = u.user__id
+        WHERE tournament__id = $1
+      `,
+      [tournamentId]
+    ).then((res) => {
+      return res.rows[0].count
+    })
+  }
+
+  public static async getTournamentPlayers(tournamentId: string): Promise<User[]> {
+    return getPool().query<IUser>(
+      `
+        SELECT tournament_player.user__id, username, steam_username, rating
+        FROM tournament.user__tournament tournament_player
+            JOIN iam."user" u ON tournament_player.user__id = u.user__id
+        WHERE tournament__id = $1
+      `,
+      [tournamentId]
+    ).then((res) => {
+      return res.rows.map((row) => User.fromObject(row))
+    })
+  }
+
   /**
    * retourne tous les tournois
    */
-  public static async getAllTournaments(limit = 10, offset = 0, includeClosed = false): Promise<Tournament[]> {
-    return getPool().query<ITournament & IUser>(
+  public static async getAllTournaments(
+    limit = 10,
+    offset = 0,
+    includeClosed = false
+  ): Promise<Tournament[]> {
+    return getPool().query<ITournament & IUser & { player_count: number }>(
       `
-        SELECT tournament__id, owner__id, name, start_at, user__id, username, steam_username, rating, password
-        FROM tournament.tournament
-            JOIN iam."user" u ON tournament.owner__id = u.user__id
-        ${!includeClosed ? 'WHERE start_at > NOW()' : ''}
-        ORDER BY start_at DESC
-        LIMIT $1 OFFSET $2
+          SELECT t.tournament__id,
+                 owner__id,
+                 max_players,
+                 name,
+                 start_at,
+                 u.user__id,
+                 username,
+                 steam_username,
+                 rating,
+                 password,
+                 count(tp.user__id) as player_count
+          FROM tournament.tournament t
+                   JOIN iam."user" u ON t.owner__id = u.user__id
+                   JOIN tournament.user__tournament tp ON tp.tournament__id = t.tournament__id
+          ${!includeClosed ? 'WHERE start_at > NOW()' : ''}
+          GROUP BY t.tournament__id,
+                   owner__id,
+                   max_players,
+                   name,
+                   start_at,
+                   u.user__id,
+                   username,
+                   steam_username,
+                   rating,
+                   password
+          ORDER BY start_at DESC
+          LIMIT $1 OFFSET $2
       `,
       [limit, offset]
     ).then((res) => {
@@ -53,8 +107,23 @@ export class TournamentRepository {
         const tournament = Tournament.fromObject(row)
         const user = User.fromObject(row)
         tournament.user = user
+        tournament.player_count = row.player_count
         return tournament
       })
+    })
+  }
+
+  public static async makeParticipate(tournamentId: string, userId: string): Promise<void> {
+    return getPool().query(
+      `
+        INSERT INTO tournament.user__tournament (tournament__id, user__id)
+        VALUES ($1, $2)
+      `,
+      [tournamentId, userId]
+    ).then((res) => {
+      if (res.rowCount !== 1) {
+        throw new EntityAlreadyExists()
+      }
     })
   }
 

@@ -3,9 +3,7 @@
 import {IUser} from "@/server/entities/iam/user";
 import {ITournament} from "@/server/entities/tournament/tournament";
 
-export type TournamentWithUser = ITournament & { user: IUser }
-
-export async function getTournaments(params: any = {}): Promise<TournamentWithUser[]> {
+export async function getTournaments(params: any = {}): Promise<ITournament[]> {
   const urlParams = {
     includes: 'user',
     ...params
@@ -18,11 +16,23 @@ export async function getTournaments(params: any = {}): Promise<TournamentWithUs
       }
       return res.json()
     })
-    .then(json => json.data)
+    .then(json => json.data.map((tournament: ITournament) => ({
+      ...tournament,
+      start_at: new Date(tournament.start_at)
+    })))
 }
 
-export async function getTournamentById(id: string): Promise<ITournament & { user: IUser }> {
+export async function getTournamentById(id: string): Promise<ITournament> {
   return fetch(`http://localhost:3000/api/tournaments/${id}?includes=user`)
+    .then(res => res.json())
+    .then(json => ({
+      ...json.data,
+      start_at: new Date(json.data.start_at)
+    }))
+}
+
+export async function getTournamentPlayers(id: string): Promise<IUser[]> {
+  return fetch(`http://localhost:3000/api/tournaments/${id}/players`)
     .then(res => res.json())
     .then(json => json.data)
 }
