@@ -35,7 +35,7 @@ export default function Guides() {
             <Button cta href="/tournois/nouveau">Créer un tournoi</Button>
           }
         </div>
-        <Table cols={5}>
+          <Table cols={5}>
           <Table.Head>
             <div>Nom</div>
             <div>Places</div>

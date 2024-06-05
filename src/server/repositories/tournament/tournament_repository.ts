@@ -82,11 +82,10 @@ export class TournamentRepository {
                  username,
                  steam_username,
                  rating,
-                 password,
                  count(tp.user__id) as player_count
           FROM tournament.tournament t
                    JOIN iam."user" u ON t.owner__id = u.user__id
-                   JOIN tournament.user__tournament tp ON tp.tournament__id = t.tournament__id
+                   LEFT JOIN tournament.user__tournament tp ON tp.tournament__id = t.tournament__id
           ${!includeClosed ? 'WHERE start_at > NOW()' : ''}
           GROUP BY t.tournament__id,
                    owner__id,
@@ -96,8 +95,7 @@ export class TournamentRepository {
                    u.user__id,
                    username,
                    steam_username,
-                   rating,
-                   password
+                   rating
           ORDER BY start_at DESC
           LIMIT $1 OFFSET $2
       `,

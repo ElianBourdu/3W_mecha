@@ -12,8 +12,10 @@ export async function getTournaments(params: any = {}): Promise<ITournament[]> {
   return fetch(`http://localhost:3000/api/tournaments?${stringParams}`)
     .then(res => {
       if (!res.ok) {
+        console.error(res)
         throw new Error('Failed to get tournaments')
       }
+
       return res.json()
     })
     .then(json => json.data.map((tournament: ITournament) => ({

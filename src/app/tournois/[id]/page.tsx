@@ -2,28 +2,30 @@ import styles from "./page.module.css";
 import {getTournamentById, getTournamentPlayers} from "@/lib/getTournaments";
 import H1 from "@/components/titles/h1";
 import {getUser} from "@/lib/getUser";
-import Button from "@/components/button/button";
 import Table from "@/components/table/table";
-import Countdown from "@/components/countdown/countdown";
+import dynamic from 'next/dynamic'
+import Participate from "@/app/tournois/[id]/participate";
+
+const Countdown = dynamic(() => import('@/components/countdown/countdown'), { ssr: false })
 
 export default async function Tournoi({ params }: {params: {id: string}}) {
   const tournament = await getTournamentById(params.id)
   const players = (await getTournamentPlayers(params.id)).sort((a, b) => b.rating - a.rating)
   const user = await getUser()
   const alreadyStarted = new Date() > tournament.start_at
-  const alreadyParticipate = players.map(p => p.user__id).includes(user.user__id)
+  const alreadyParticipate = players.map(p => p.user__id).includes(user?.user__id)
 
   return (
     <div className={styles.tournament_container}>
       <H1>{ tournament.name }</H1>
-      <Countdown startDate={tournament.start_at}/>
+      <Countdown closingDate={tournament.start_at}/>
       <p>Tournoi organisé par { tournament.user.username }</p>
       { alreadyStarted
         ? <p>Le tournoi a déjà commencé</p>
         : <p>Le tournoi commence le {tournament.start_at.toLocaleDateString()} à {tournament.start_at.toLocaleTimeString()}</p>
       }
       { !!user && !alreadyParticipate &&
-        <Button cta primary>Participer !</Button>
+        <Participate tournament__id={params.id} />
       }
       <Table cols={2}>
         <Table.Head>
@@ -31,7 +33,7 @@ export default async function Tournoi({ params }: {params: {id: string}}) {
           <div>MMR</div>
         </Table.Head>
         {players.map((user, index) => (
-          <Table.Row>
+          <Table.Row key={user.user__id}>
             <div>{user.username}</div>
             <div>{user.rating ?? 'non classé'}</div>
           </Table.Row>
