@@ -30,7 +30,7 @@ export default async function Tournoi({ params }: {params: {id: string}}) {
           Check-in !
         </Button>
       }
-      { !!user && !alreadyParticipate &&
+      { !!user && !alreadyParticipate && !alreadyStarted &&
         <Participate tournament__id={params.id} />
       }
       <Table cols={2}>
