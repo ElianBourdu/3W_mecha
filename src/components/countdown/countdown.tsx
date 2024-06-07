@@ -25,19 +25,35 @@ function calculatedCountdown(countDownDate: number) {
 export default function Countdown({closingDate}: {closingDate: Date}) {
   // Set the date we're counting down to
   const closingTimestamp = closingDate.getTime();
+  let _isTimeElapsed = false
+  let initialCountdown = ""
+  try {
+    initialCountdown = calculatedCountdown(closingTimestamp)
+  } catch(e) {
+    _isTimeElapsed = true
+  }
 
-  const [countdown, setCountdown] = useState(calculatedCountdown(closingTimestamp))
+  const [countdown, setCountdown] = useState(initialCountdown)
+  const [isTimeElapsed, setIsTimeElapsed] = useState(_isTimeElapsed)
 
   useEffect(() => {
+    if (isTimeElapsed) return
+
     // Update the count down every 1 second
     let x = setInterval(() => {
-      setCountdown(calculatedCountdown(closingTimestamp))
+      try {
+        setCountdown(calculatedCountdown(closingTimestamp))
+      } catch(e) {
+        setIsTimeElapsed(true)
+        clearInterval(x)
+        document.location.reload()
+      }
     }, 1000);
   }, []);
 
   return (
     <div className={styles.countdown}>
-      {countdown}
+      {!isTimeElapsed ? countdown : 'It is tiiiiiiiiiime'}
     </div>
   )
 }
