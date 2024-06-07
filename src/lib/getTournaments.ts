@@ -31,7 +31,9 @@ export async function getTournamentById(id: string): Promise<ITournament> {
 }
 
 export async function getTournamentPlayers(id: string): Promise<IUser[]> {
-  return fetch(`http://localhost:3000/api/tournaments/${id}/players`)
+  return fetch(`http://localhost:3000/api/tournaments/${id}/players`, {
+    cache: 'no-cache'
+  })
     .then(res => res.json())
     .then(json => json.data)
 }
