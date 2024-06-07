@@ -9,7 +9,7 @@ import {IUser} from "@/server/entities/iam/user";
 import {ITournament} from "@/server/entities/tournament/tournament";
 import Table from "@/components/table/table";
 
-export default function Guides() {
+export default function MyTournaments() {
   const [tournaments, setTournaments] = useState<ITournament[]>([])
   const [user, setUser] = useState<IUser>(null)
 
@@ -37,7 +37,7 @@ export default function Guides() {
           </Table.Head>
           { tournaments.map(tournament => {
             return (
-              <Table.Row className={styles.row}>
+              <Table.Row className={styles.row} key={tournament.tournament__id}>
                 <p>{tournament.name}</p>
                 <p>créé par {tournament.user.username}</p>
                 <p> {tournament.start_at.toLocaleString()} </p>
