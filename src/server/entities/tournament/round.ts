@@ -35,12 +35,12 @@ export class Round implements IRound {
     round.round__id = object.round__id
     round.tournament__id = object.tournament__id
     round.stage = object.stage
-    round.start_at = object.start_at
+    round.start_at = new Date(object.start_at)
     round.first_player__id = object.first_player__id
-    round.first_player_checkin = object.first_player_checkin
+    round.first_player_checkin = object.first_player_checkin ? new Date(object.first_player_checkin) : null
     round.first_player_result = object.first_player_result
     round.second_player__id = object.second_player__id
-    round.second_player_checkin = object.second_player_checkin
+    round.second_player_checkin = object.second_player_checkin ? new Date(object.second_player_checkin) : null
     round.second_player_result = object.second_player_result
     return round
   }
@@ -52,10 +52,10 @@ export class Round implements IRound {
       stage: this.stage,
       start_at: this.start_at.toISOString(),
       first_player__id: this.first_player__id,
-      first_player_checkin: this.first_player_checkin.toISOString(),
+      first_player_checkin: this.first_player_checkin?.toISOString() ?? null,
       first_player_result: this.first_player_result,
       second_player__id: this.second_player__id,
-      second_player_checkin: this.second_player_checkin.toISOString(),
+      second_player_checkin: this.second_player_checkin?.toISOString() ?? null,
       second_player_result: this.second_player_result,
     }
   }

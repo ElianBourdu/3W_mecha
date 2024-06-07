@@ -1,8 +1,8 @@
 import styles from "./page.module.css";
-import {getUser} from "@/lib/getUser";
+import {getLoggedInUser} from "@/lib/getUser";
 
 export default async function Home() {
-  const user = await getUser()
+  const user = await getLoggedInUser()
 
   return (
     <main className={styles.main}>

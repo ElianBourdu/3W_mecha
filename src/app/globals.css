@@ -130,7 +130,15 @@ body {
 }
 
 body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
+body > main {
+  flex: 1 1;
+  display: flex;
 }
 
 a {

@@ -24,7 +24,7 @@ export async function matchMaker(tournamentId: string): Promise<Round[]> {
   const stage = rounds.reduce((acc, round) => Math.max(acc, round.stage), 0)
   // on vérifie que le stage est fini
   const isStageFinished = rounds.reduce((acc, round) => {
-    return acc && round.first_player_result !== undefined && round.second_player_result !== undefined
+    return acc && round.first_player_result !== null && round.second_player_result !== null
   }, true)
 
   // TODO: handle AFK players
@@ -37,16 +37,16 @@ export async function matchMaker(tournamentId: string): Promise<Round[]> {
   // assigne les victoires et défaites de chaque joueur pour faciliter le code par la suite
   players.forEach(player => {
     player.victories = rounds.filter(round => {
-      // si les deux joueurs n'ont pas donner le même résultats, on remonte une erreur
-      if (round.first_player_result === round.second_player_result) {
+      // si les deux joueurs ont donner le même résultats, on remonte une erreur
+      if (round.first_player_result === round.second_player_result && round.first_player_result !== null) {
         throw new InvalidRound(round, 'Players gave the same result, round is invalid')
       }
       return round.first_player_result && round.first_player__id === player.user__id
         || round.second_player_result && round.second_player__id === player.user__id
     })
     player.defeats = rounds.filter(round => {
-      // si les deux joueurs n'ont pas donner le même résultats, on remonte une erreur
-      if (round.first_player_result === round.second_player_result) {
+      // si les deux joueurs ont donner le même résultats, on remonte une erreur
+      if (round.first_player_result === round.second_player_result && round.first_player_result !== null) {
         throw new InvalidRound(round, 'Players gave the same result, round is invalid')
       }
       return !round.first_player_result && round.first_player__id === player.user__id

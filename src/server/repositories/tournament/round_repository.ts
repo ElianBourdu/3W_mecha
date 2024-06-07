@@ -35,7 +35,7 @@ export class RoundRepository {
     })
   }
 
-  public static async getCurrentRound(tournamentId: string, playerId: string): Promise<Round> {
+  public static async getCurrentRound(tournamentId: string, playerId: string, includeCheckedinRound: boolean): Promise<Round> {
     return getPool().query<IRound>(
       `
         SELECT round__id, tournament__id, stage, start_at, first_player__id, first_player_checkin, first_player_result, second_player__id, second_player_checkin, second_player_result
@@ -43,7 +43,7 @@ export class RoundRepository {
         WHERE
             tournament__id = $1
           AND (first_player__id = $2 OR second_player__id = $2)
-          AND (first_player_checkin = FALSE OR second_player_checkin = FALSE)
+          ${includeCheckedinRound ? '' : 'AND (first_player_checkin IS NULL OR second_player_checkin IS NULL)'}
         ORDER BY stage DESC
         LIMIT 1
       `,
@@ -56,4 +56,51 @@ export class RoundRepository {
       return Round.fromObject(res.rows[0])
     })
   }
+
+  public static async updateCheckinPlayer(tournament__id: string, user__id: string): Promise<Round> {
+    return getPool().query<IRound>(
+      `
+      UPDATE tournament.round
+      SET first_player_checkin = 
+          CASE WHEN round.first_player__id = $1 AND round.first_player_checkin IS NULL
+              THEN current_timestamp
+          ELSE first_player_checkin END,
+          second_player_checkin =
+          CASE WHEN round.second_player__id = $1 AND round.second_player_checkin IS NULL
+              THEN current_timestamp 
+          ELSE second_player_checkin END
+      WHERE (first_player__id = $1 OR second_player__id = $1) AND tournament__id = $2 
+      RETURNING *
+      `,[user__id, tournament__id]
+    ).then((res) => {
+      if (res.rowCount === 0) {
+        throw new EntityNotFoundException('Round', {first_layer__id: user__id, second_player__id: user__id})
+      }
+
+      return Round.fromObject(res.rows[0])
+    })
+  }
+
+  public static async registerPlayerResult(round__id: string, user__id: string, is_user_winning: boolean): Promise<Round> {
+    return getPool().query(`
+      UPDATE tournament.round
+      SET first_player_result =
+          CASE WHEN round.first_player__id = $1 AND round.first_player_result IS NULL
+            THEN $2
+            ELSE first_player_result END,
+            second_player_result =
+          CASE WHEN round.second_player__id = $1 AND round.second_player_result IS NULL
+            THEN $2
+            ELSE second_player_result END
+      WHERE round__id = $3
+    `, [user__id, is_user_winning, round__id])
+      .then(res => {
+        if (res.rowCount === 0) {
+          throw new EntityNotFoundException('Round', {round__id})
+        }
+
+        return Round.fromObject(res.rows[0])
+      })
+  }
+
 }

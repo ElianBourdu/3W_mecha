@@ -18,6 +18,6 @@ export function Logout() {
   }
 
   return (
-    <Button cta primary onClick={signout}>deconnexion</Button>
+    <Button primary onClick={signout}>deconnexion</Button>
   )
 }

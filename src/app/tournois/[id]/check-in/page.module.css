@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0;
+}
+
+.players {
+  display: flex;
+  flex: 1 0;
+}
+
+.player {
+  flex-direction: column;
+  flex: 1 0;
+  display: flex;
+  align-items: center;
+  padding: 2em;
+  gap: 1em;
+}
+
+.playerName {
+  font-size: 3em;
+}
+
+.player:last-child {
+  border-left: 1px solid grey;
+  flex: 1 1;
+}

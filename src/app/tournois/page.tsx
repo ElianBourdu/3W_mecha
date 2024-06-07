@@ -6,7 +6,7 @@ import {getTournaments} from "@/lib/getTournaments";
 import Tournament from "@/app/tournois/tournament";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
-import {getUser} from "@/lib/getUser";
+import {getLoggedInUser} from "@/lib/getUser";
 import {IUser} from "@/server/entities/iam/user";
 import {ITournament} from "@/server/entities/tournament/tournament";
 import Table from "@/components/table/table";
@@ -20,7 +20,7 @@ export default function Guides() {
   }
 
   useEffect(() => {
-    getUser().then(user => setUser(user))
+    getLoggedInUser().then(user => setUser(user))
     getTournaments({
       ...(getClosed ? { includeClosed: true } : {})
     }).then(tournaments => setTournaments(tournaments))
