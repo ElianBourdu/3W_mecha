@@ -1,11 +1,11 @@
 import styles from "./navbar.module.css";
 import Button from "@/components/button/button";
-import {getUser} from "@/lib/getUser";
+import {getLoggedInUser} from "@/lib/getUser";
 import {useRouter} from "next/navigation";
 import {Logout} from "@/components/navbar/logout";
 
 export default async function Navbar() {
-  const user = await getUser()
+  const user = await getLoggedInUser()
 
   return (
     <nav className={styles.navbar}>
@@ -13,6 +13,9 @@ export default async function Navbar() {
         <Button href='/'>home</Button>
         <Button href='/guides'>guides</Button>
         <Button href='/tournois'>tournois</Button>
+        { !!user &&
+          <Button href='/tournois/mes-tournois'>mes tournois</Button>
+        }
       </div>
       <div className={styles.ctas}>
         { !user &&

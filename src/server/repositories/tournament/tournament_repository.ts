@@ -142,4 +142,24 @@ export class TournamentRepository {
       return Tournament.fromObject(res.rows[0])
     })
   }
+
+  public static async getTournamentJoinedByPlayer(user__id: string): Promise<Tournament[]> {
+    return getPool().query<ITournament & IUser>(
+      `
+        SELECT t.tournament__id, owner__id, name, start_at, max_players
+        FROM tournament.tournament t
+        JOIN tournament.user__tournament ut on t.tournament__id = ut.tournament__id
+        JOIN iam."user" u ON t.owner__id = u.user__id
+        WHERE ut.user__id = $1
+      `, [user__id])
+      .then((res) => {
+        return res.rows.map((row) => {
+          const tournament = Tournament.fromObject(row)
+          const user = User.fromObject(row)
+          tournament.user = user
+          tournament.player_count = row.player_count
+          return tournament
+        })
+      })
+  }
 }

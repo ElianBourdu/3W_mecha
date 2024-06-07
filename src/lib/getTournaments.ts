@@ -1,5 +1,3 @@
-'use server'
-
 import {IUser} from "@/server/entities/iam/user";
 import {ITournament} from "@/server/entities/tournament/tournament";
 
@@ -12,7 +10,6 @@ export async function getTournaments(params: any = {}): Promise<ITournament[]> {
   return fetch(`http://localhost:3000/api/tournaments?${stringParams}`)
     .then(res => {
       if (!res.ok) {
-        console.error(res)
         throw new Error('Failed to get tournaments')
       }
 
@@ -35,6 +32,12 @@ export async function getTournamentById(id: string): Promise<ITournament> {
 
 export async function getTournamentPlayers(id: string): Promise<IUser[]> {
   return fetch(`http://localhost:3000/api/tournaments/${id}/players`)
+    .then(res => res.json())
+    .then(json => json.data)
+}
+
+export async function getMyTournaments(): Promise<ITournament[]> {
+  return fetch('http://localhost:3000/api/tournaments/mine')
     .then(res => res.json())
     .then(json => json.data)
 }
