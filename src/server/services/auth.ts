@@ -1,7 +1,6 @@
 import { hash, compare } from 'bcryptjs'
-import { sign, verify } from 'jsonwebtoken'
+import {sign, verify, decode, JwtPayload} from 'jsonwebtoken'
 import {PasswordNotMatchingException} from "@/server/errors/password_not_matching";
-import {NextResponse} from "next/server";
 import {IUser} from "@/server/entities/iam/user";
 
 const SALT_ROUND = +process.env.SALT_ROUND ?? 10
@@ -31,10 +30,13 @@ export async function createJWT(payload: Record<string, any>): Promise<string> {
 
 export async function verifyJWT(token: string): Promise<Record<string, any>> {
   return new Promise((resolve, reject) => {
-    return verify(token, JWT_SECRET, (error, decoded) => {
+    return verify(token, JWT_SECRET, (error, decoded: JwtPayload) => {
       if (error) {
         return reject(error)
       }
+
+      const { username, user__id, steam_username } = decoded
+      createJWT({ username, user__id, steam_username })
 
       return resolve(decoded as Record<string, any>)
     })
