@@ -1,8 +1,6 @@
 'use server'
 
 import {IGuide} from "@/server/entities/guide/guide";
-import {IUser} from "@/server/entities/iam/user";
-
 
 export async function getGuides(params: any = {}): Promise<IGuide[]> {
   const urlParams = {

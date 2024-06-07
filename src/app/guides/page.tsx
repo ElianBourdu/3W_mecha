@@ -7,7 +7,7 @@ import {getGuides} from "@/lib/getGuides";
 import {useEffect, useState} from "react";
 import styles from "./page.module.css";
 import Button from "@/components/button/button";
-import {getUser} from "@/lib/getUser";
+import {getLoggedInUser} from "@/lib/getUser";
 import Input from "@/components/input/input";
 
 export default function Guides() {
@@ -18,7 +18,7 @@ export default function Guides() {
   }
 
   useEffect(() => {
-    getUser().then(user => setUser(user))
+    getLoggedInUser().then(user => setUser(user))
     getGuides().then(guides => setGuides(guides))
   }, [])
 
