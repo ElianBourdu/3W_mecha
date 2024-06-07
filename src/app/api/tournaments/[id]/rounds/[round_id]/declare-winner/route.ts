@@ -25,10 +25,8 @@ export async function POST(request: NextRequest,  { params }: { params: { round_
   const is_user_winning = value.winning_user_id === user.user__id;
 
   return RoundRepository.registerPlayerResult(params.round_id, user.user__id, is_user_winning)
-    .then((tournament) => {
-      return Response.json({
-        data: tournament.toJson()
-      })
+    .then((round) => {
+      return NextResponse.json({ data: round.toJson() }, { status: 200 })
     })
     .catch((error: Error) => {
       if (error instanceof EntityNotFoundException) {

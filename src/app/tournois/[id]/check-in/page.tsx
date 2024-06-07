@@ -21,7 +21,9 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
   function handleWinner(user) {
     return () => {
       callWinnerInRound(round.tournament__id, round.round__id, user.user__id)
-        .then()
+        .then((round) => {
+          setRound(round)
+        })
     }
   }
 
@@ -60,27 +62,29 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
           <div className={styles.player}>
             <p className={styles.playerName}>{firstUser.steam_username}</p>
             {
-              round.first_player_checkin && !isStarted
+              !isStarted && (round.first_player_checkin
                 ? <div>READY</div>
-                : <div>en attente</div>
+                : <div>en attente</div>)
             }
-            {
-              isStarted && result !== null
-                ? <div> { (current_user_is_first_player ? result : !result) ? 'WINNER' : 'LOSER' } </div>
-                : <Button cta primary onClick={handleWinner(firstUser)}>WINNER ?</Button>
+            {result !== null && isStarted &&
+              <div> {(current_user_is_first_player ? result : !result) ? 'WINNER' : 'LOSER'} </div>
+            }
+            {isStarted && result === null &&
+              <Button cta primary onClick={handleWinner(firstUser)}>WINNER ?</Button>
             }
           </div>
           <div className={styles.player}>
             <p className={styles.playerName}>{secondUser.steam_username}</p>
             {
-              round.second_player_checkin && !isStarted
+              !isStarted && (round.second_player_checkin
                 ? <div>READY</div>
-                : <div>en attente</div>
+                : <div>en attente</div>)
             }
-            {
-              isStarted && result !== null
-                ? <div> { (current_user_is_first_player ? !result : result)  ? 'WINNER' : 'LOSER' } </div>
-                : <Button cta primary onClick={handleWinner(secondUser)}>WINNER ?</Button>
+            { result !== null && isStarted &&
+              <div> {(current_user_is_first_player ? !result : result) ? 'WINNER' : 'LOSER'} </div>
+            }
+            { isStarted && result === null &&
+              <Button cta primary onClick={handleWinner(secondUser)}>WINNER ?</Button>
             }
           </div>
         </div>

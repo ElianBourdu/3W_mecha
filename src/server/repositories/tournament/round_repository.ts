@@ -93,6 +93,7 @@ export class RoundRepository {
             THEN $2
             ELSE second_player_result END
       WHERE round__id = $3
+      RETURNING *
     `, [user__id, is_user_winning, round__id])
       .then(res => {
         if (res.rowCount === 0) {

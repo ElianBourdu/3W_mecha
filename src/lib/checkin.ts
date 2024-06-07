@@ -18,10 +18,11 @@ export async function checkin(tournament__id: string): Promise<IRound> {
 }
 
 export function callWinnerInRound(tournament__id: string, round__id: string, user__id: string) {
-  return fetch(`/api/tournaments/${tournament__id}/rounds/${round__id}`, {
+  return fetch(`/api/tournaments/${tournament__id}/rounds/${round__id}/declare-winner`, {
     method: 'POST',
     body: JSON.stringify({
       winning_user_id: user__id
     })
   }).then(res => res.json())
+    .then(json => json.data)
 }
