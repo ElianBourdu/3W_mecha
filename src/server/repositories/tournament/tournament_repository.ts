@@ -5,6 +5,8 @@ import {IUser} from "@/server/entities/iam/user";
 import {User} from "@/server/entities/iam/user";
 import {EntityAlreadyExists} from "@/server/errors/entity_already_exists";
 
+type UserVictoriesCount = { victories: number, user: User }
+
 export class TournamentRepository {
   // avoid any construction of the class, every method will be static
   private constructor() {}
@@ -161,5 +163,46 @@ export class TournamentRepository {
           return tournament
         })
       })
+  }
+
+  /**
+   * @param tournament__id string
+   * @return UserVictoriesCount
+   * Victories, user__id
+   * 2,9c606402-5500-4177-a58e-5f2296a6b82f
+   * 1,3e59b833-fd3f-4966-8c8b-d1b3d87fef5c
+   * 1,4ec91c24-80a8-44ad-87c2-e8404244bf76
+   */
+  public static async getSortedUsersVictories(tournament__id: string): Promise<UserVictoriesCount[]> {
+    return getPool().query<{ victories: number } & IUser>(
+      `
+          with t as (
+              select 1 as query_id, count(first_player_result) as victories, first_player__id as user__id
+              from tournament.round
+              where tournament__id = $1 and first_player_result = true
+              group by first_player__id
+              UNION
+              select 2 as query_id, count(second_player_result) as victories, second_player__id as user__id
+              from tournament.round
+              where tournament__id = $1 and second_player_result = true
+              group by second_player__id
+              UNION
+              select 3 as query_id, 0 as victories, user__id 
+              from tournament.user__tournament
+              where tournament__id = $1
+          )
+          select sum(victories) as victories, u.* 
+          from t
+          join iam."user" u on u.user__id = t.user__id
+          group by u.user__id
+          order by victories desc
+      `, [tournament__id]
+    ).then((res) => {
+      console.log(res.rows)
+      return res.rows.map((row) => ({
+        victories: +row.victories,
+        user: User.fromObject(row)
+      }))
+    })
   }
 }

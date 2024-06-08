@@ -1,13 +1,15 @@
 import {NextRequest, NextResponse} from "next/server";
-import {getUserFromToken} from "@/server/services/auth";
+import {getUserFromTokenAndRenew} from "@/server/services/auth";
 import {RoundRepository} from "@/server/repositories/tournament/round_repository";
 import {EntityNotFoundException} from "@/server/errors/not_found";
-import {matchMaker} from "@/server/services/tournament";
+import {MatchMaker} from "@/server/services/tournament";
 import {Round} from "@/server/entities/tournament/round";
 import {StageNotFinished} from "@/server/errors/stage_not_finished";
 import {sleep} from "@/server/util/sleep";
 import {StreamingResponse} from "@/server/util/streamingResponse";
 import {makeStream} from "@/server/util/makeStream";
+import {AlreadyGeneratingMatch} from "@/server/errors/already_generating_match";
+import {TournamentAlreadyWon} from "@/server/errors/tournament_already_won";
 
 async function *fetchUncheckedRoundByOpponant(tournament__id: string, user__id: string): AsyncGenerator<boolean> {
   let loopCount = 0
@@ -25,7 +27,7 @@ async function *fetchUncheckedRoundByOpponant(tournament__id: string, user__id: 
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -42,12 +44,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         // si il n'y a pas de round a "check-in", peut-etre que tout les matchs sont fini,
         // on essaye donc de lancé les nouveaux matchs, pas besoin de gérer les cas
         // d'erreur ici, c'est soit un problème de de tournoi en cours, soit une erreur d'entrée des joueurs
-        return matchMaker(params.id)
+        return MatchMaker.newGeneration(params.id)
           .then(rounds => {
             // si on a des rounds retourner par le matchmaker, on les inserts
             return Promise.all(rounds.map(round => RoundRepository.createRound(round)))
           })
-          .then(rounds => {
+          .then(() => {
             // puis on update notre checkin pour l'utilisateur concerné
             return RoundRepository.updateCheckinPlayer(params.id, user.user__id)
           })
@@ -61,6 +63,16 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
                   return NextResponse.json({ data: round.toJson() }, { status: 200 })
                 })
             }
+
+            // si un matchmaking est en cours de traitement, juste informer le client
+            if (error instanceof AlreadyGeneratingMatch) {
+              return NextResponse.json({}, { status: 202 })
+            }
+
+            if (error instanceof TournamentAlreadyWon) {
+              return NextResponse.json(null, { status: 204 })
+            }
+
             return NextResponse.json({ error: error.message, data: null }, { status: 404 })
           })
       }
@@ -69,7 +81,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 }
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

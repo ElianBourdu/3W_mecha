@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {EntityNotFoundException} from "@/server/errors/not_found";
 import {RoundRepository} from "@/server/repositories/tournament/round_repository";
-import {getUserFromToken} from "@/server/services/auth";
+import {getUserFromTokenAndRenew} from "@/server/services/auth";
 import Joi from "joi";
 
 const schema = Joi.object({
@@ -11,7 +11,7 @@ const schema = Joi.object({
 })
 
 export async function POST(request: NextRequest,  { params }: { params: { round_id: string, id: string } }) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

@@ -32,20 +32,20 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
     getTournamentById(params.id).then(tournament => setTournament(tournament))
     checkin(params.id)
       .then(round => {
+        // if there's no round returned, it might be because matchmaking is in progress
+        if (!round) return
+
         setRound(round)
         setIsStarted(!!round.first_player_checkin && !!round.second_player_checkin)
-        return round
-      })
-      // fetch the two players in the round
-      .then((round) => {
+
+        // fetch the two players in the round
         return Promise.all([
           getUser(round.first_player__id),
           getUser(round.second_player__id)
-        ])
-      })
-      .then(([firstUser, secondUser]) => {
-        setFirstUser(firstUser)
-        setSecondUser(secondUser)
+        ]).then(([firstUser, secondUser]) => {
+          setFirstUser(firstUser)
+          setSecondUser(secondUser)
+        })
       })
   }, []);
 

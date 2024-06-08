@@ -1,9 +1,9 @@
 import {NextRequest, NextResponse} from "next/server";
 import {TournamentRepository} from "@/server/repositories/tournament/tournament_repository";
-import {getUserFromToken} from "@/server/services/auth";
+import {getUserFromTokenAndRenew} from "@/server/services/auth";
 
 export async function GET(request: NextRequest) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

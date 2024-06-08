@@ -1,5 +1,7 @@
 import {IUser} from "@/server/entities/iam/user";
 import {ITournament} from "@/server/entities/tournament/tournament";
+import {IRound} from "@/server/entities/tournament/round";
+import {api} from "@/lib/api";
 
 export async function getTournaments(params: any = {}): Promise<ITournament[]> {
   const urlParams = {
@@ -42,4 +44,12 @@ export async function getMyTournaments(): Promise<ITournament[]> {
   return fetch('http://localhost:3000/api/tournaments/mine')
     .then(res => res.json())
     .then(json => json.data)
+}
+
+export async function getTournamentResults(id: string): Promise<{
+  status: 'done' | 'running',
+  stages: Record<number, IRound[]>,
+  users_victories: { victories: number, user: IUser }[]
+}> {
+  return api(`/api/tournaments/${id}/status`)
 }

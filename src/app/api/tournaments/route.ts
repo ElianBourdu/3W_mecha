@@ -1,7 +1,7 @@
 import {type NextRequest, NextResponse} from 'next/server'
 import {TournamentRepository} from "@/server/repositories/tournament/tournament_repository";
 import Joi from "joi";
-import {getUserFromToken} from "@/server/services/auth";
+import {getUserFromTokenAndRenew} from "@/server/services/auth";
 
 const schema = Joi.object({
   name: Joi.string()
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
