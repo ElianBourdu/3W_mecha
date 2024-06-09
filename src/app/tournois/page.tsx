@@ -51,7 +51,7 @@ export default function Guides() {
                 <p>créé par {tournament.user.username}</p>
                 <p> {tournament.start_at.toLocaleString()} </p>
                 <div className={styles.button}>
-                  <Button cta href={`/tournois/${encodeURI(tournament.tournament__id)}`}>
+                  <Button href={`/tournois/${encodeURI(tournament.tournament__id)}`}>
                     Voir plus
                   </Button>
                 </div>

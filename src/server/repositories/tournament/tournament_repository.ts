@@ -148,7 +148,7 @@ export class TournamentRepository {
   public static async getTournamentJoinedByPlayer(user__id: string): Promise<Tournament[]> {
     return getPool().query<ITournament & IUser>(
       `
-        SELECT t.tournament__id, owner__id, name, start_at, max_players
+        SELECT t.tournament__id, owner__id, name, start_at, max_players, u.*
         FROM tournament.tournament t
         JOIN tournament.user__tournament ut on t.tournament__id = ut.tournament__id
         JOIN iam."user" u ON t.owner__id = u.user__id

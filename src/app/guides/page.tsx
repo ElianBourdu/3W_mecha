@@ -23,7 +23,7 @@ export default function Guides() {
   }, [])
 
   return (
-    <>
+    <div className={styles.container}>
       <div className={styles.headWrapper}>
         <Input placeholder="Rechercher un guide !" onChange={handleChange} />
         { !!user &&
@@ -37,6 +37,6 @@ export default function Guides() {
           )
         })}
       </div>
-    </>
+    </div>
   )
 }

@@ -17,7 +17,8 @@ export default function MyTournaments() {
   useEffect(() => {
     getLoggedInUser().then(user => setUser(user))
     getMyTournaments().then(tournaments => {
-      setTournaments(tournaments)
+      setTournaments(tournaments.map(tournament =>
+        ({ ...tournament, start_at: new Date(tournament.start_at) }) ))
     })
   }, [])
 
@@ -41,9 +42,16 @@ export default function MyTournaments() {
               <Table.Row className={styles.row} key={tournament.tournament__id}>
                 <p>{tournament.name}</p>
                 <p>créé par {tournament.user.username}</p>
-                <p> {tournament.start_at.toLocaleString()} </p>
+                <p>{tournament.start_at.toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: false
+                })}</p>
                 <div className={styles.button}>
-                  <Button cta href={`/tournois/${encodeURI(tournament.tournament__id)}`}>
+                  <Button href={`/tournois/${encodeURI(tournament.tournament__id)}`}>
                     Voir plus
                   </Button>
                 </div>
