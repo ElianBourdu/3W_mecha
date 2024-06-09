@@ -12,6 +12,7 @@ import Table from "@/components/table/table";
 export default function MyTournaments() {
   const [tournaments, setTournaments] = useState<ITournament[]>([])
   const [user, setUser] = useState<IUser>(null)
+  console.log(tournaments)
 
   useEffect(() => {
     getLoggedInUser().then(user => setUser(user))

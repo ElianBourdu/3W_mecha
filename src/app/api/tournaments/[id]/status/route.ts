@@ -8,9 +8,8 @@ export async function GET(request: NextRequest,  { params }: { params: { id: str
     TournamentRepository.getSortedUsersVictories(params.id),
     RoundRepository.getTournamentRounds(params.id)
   ]).then(([users_victories, rounds]) => {
-    console.log(users_victories)
 
-    const is_running = users_victories[0].victories > users_victories[1].victories
+    const is_running = users_victories[0].victories === users_victories[1].victories
 
     const stages = rounds.reduce((acc, round) => {
       acc[round.stage] = (acc[round.stage] ?? [])

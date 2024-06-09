@@ -7,7 +7,7 @@ CREATE TABLE iam.user (
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(60) NOT NULL,
     steam_username VARCHAR(32),
-    rating SMALLINT
+    rating SMALLINT DEFAULT 1500
 );
 
 CREATE TABLE iam.role (
