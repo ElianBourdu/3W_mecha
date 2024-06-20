@@ -2,11 +2,15 @@
 
 import styles from './page.module.css'
 import {type FormEvent} from "react";
+import Input from "@/components/input/input";
+import Button from "@/components/button/button";
+import H1 from "@/components/titles/h1";
 
 export default async function Signin() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const inputs = event.currentTarget.elements
+    console.log(inputs)
     login(inputs["username"].value, inputs["password"].value)
   }
 
@@ -15,29 +19,25 @@ export default async function Signin() {
       method: 'POST',
       body: JSON.stringify({username, password}),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data)
+      .then((res) => {
+        if (res.ok) {
+          // on utilise pas le router, pour pouvoir rafraichir la page, et donc le composant Navbar
+          window.location.href = '/'
+        } else {
+          alert('Mauvais identifiants')
+        }
       })
   }
 
   return (
     <div className={styles.formContainer}>
       <form onSubmit={handleSubmit} className={styles.form}>
-
-        <label htmlFor="username">
-          username
-          <input type="text" name="username"/>
-        </label>
-
-        <label htmlFor="password">
-          password
-          <input type="password" name="password"/>
-        </label>
-
-        <button type="submit">
+        <H1>Connexion</H1>
+        <Input type="text" name="username" placeholder="username"/>
+        <Input type="password" name="password" placeholder="password"/>
+        <Button type="submit" cta primary>
           Connexion
-        </button>
+        </Button>
       </form>
     </div>
   )

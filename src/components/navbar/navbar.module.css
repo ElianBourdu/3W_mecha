@@ -1,7 +1,17 @@
 .navbar {
     display: flex;
-    justify-content: right;
+    justify-content: space-between;
     gap: 2rem;
     padding: 1rem;
     background: var(--primary-500);
+}
+
+.links {
+    display: flex;
+    gap: 1rem;
+}
+
+.ctas {
+    display: flex;
+    gap: 1rem;
 }

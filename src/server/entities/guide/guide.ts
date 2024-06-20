@@ -1,4 +1,4 @@
-import {User} from "@/server/entities/iam/user";
+import {IUser, User} from "@/server/entities/iam/user";
 import {UserRepository} from "@/server/repositories/iam/user_repository";
 
 export interface IGuide {
@@ -6,6 +6,7 @@ export interface IGuide {
   user__id: string,
   title: string,
   content: string
+  user?: IUser
 }
 
 export class Guide implements IGuide {

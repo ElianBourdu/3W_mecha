@@ -1,0 +1,9 @@
+.tournament_container {
+  width: var(--max-width);
+  max-width: calc(100% - 2rem);
+  margin: 2rem auto;
+}
+
+.tournament_container > * {
+  margin-bottom: 1rem;
+}

@@ -3,11 +3,11 @@ CREATE SCHEMA tournament;
 CREATE SCHEMA guide;
 
 CREATE TABLE iam.user (
-      user__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      username VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(60) NOT NULL,
-      steam_username VARCHAR(32),
-      rating SMALLINT
+    user__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL,
+    steam_username VARCHAR(32),
+    rating SMALLINT DEFAULT 1500
 );
 
 CREATE TABLE iam.role (
@@ -24,27 +24,28 @@ CREATE TABLE iam.user__role(
 );
 
 CREATE TABLE tournament.tournament (
-   tournament__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-   owner__id UUID NOT NULL,
-   name VARCHAR(255) NOT NULL,
-   start_at TIMESTAMPTZ NOT NULL,
-   CONSTRAINT fk_tournament_user FOREIGN KEY (owner__id) REFERENCES iam.user(user__id)
+    tournament__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner__id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    start_at TIMESTAMPTZ NOT NULL,
+    max_player SMALLINT NOT NULL,
+    CONSTRAINT fk_tournament_user FOREIGN KEY (owner__id) REFERENCES iam.user(user__id)
 );
 
 CREATE TABLE tournament.round (
-      round__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tournament__id UUID NOT NULL,
-      stage SMALLINT NOT NULL,
-      start_at TIMESTAMPTZ NOT NULL,
-      first_player__id UUID NOT NULL,
-      first_player_checkin TIMESTAMPTZ,
-      first_player_result SMALLINT,
-      second_player__id UUID NOT NULL,
-      second_player_checkin TIMESTAMPTZ,
-      second_player_result SMALLINT,
-      CONSTRAINT fk_round_first_player FOREIGN KEY (first_player__id) REFERENCES iam.user(user__id),
-      CONSTRAINT fk_round_second_player FOREIGN KEY (second_player__id) REFERENCES iam.user(user__id),
-      CONSTRAINT fk_round_tournament FOREIGN KEY (tournament__id) REFERENCES tournament.tournament(tournament__id)
+    round__id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tournament__id UUID NOT NULL,
+    stage SMALLINT NOT NULL,
+    start_at TIMESTAMPTZ NOT NULL,
+    first_player__id UUID NOT NULL,
+    first_player_checkin TIMESTAMPTZ,
+    first_player_result BOOLEAN,
+    second_player__id UUID NOT NULL,
+    second_player_checkin TIMESTAMPTZ,
+    second_player_result BOOLEAN,
+    CONSTRAINT fk_round_first_player FOREIGN KEY (first_player__id) REFERENCES iam.user(user__id),
+    CONSTRAINT fk_round_second_player FOREIGN KEY (second_player__id) REFERENCES iam.user(user__id),
+    CONSTRAINT fk_round_tournament FOREIGN KEY (tournament__id) REFERENCES tournament.tournament(tournament__id)
 );
 
 CREATE TABLE tournament.user__tournament (

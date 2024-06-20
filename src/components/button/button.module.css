@@ -1,36 +1,92 @@
 /* Styles for link */
-.link {
+.button {
     appearance: none;
     font-family: inherit;
     font-size: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 12px 24px;
     border-radius: 12px;
     cursor: pointer;
-    color: #fff;
-    background-color: var(--primary-500);
-    transition: background-color 0.3s ease;
+    transition: background-color .3s ease;
     outline: none;
     text-align: center;
     width: auto;
     height: auto;
     display: inline-block;
-}
-
-/* Styles for link hover */
-.link:hover {
-    background-color: var(--primary-600);
-}
-
-.link:active{
-    background: var(--primary-700);
+    border: none;
 }
 
 /* Styles for button */
-.button {
-
+.cta {
+    appearance: none;
+    font-size: 1em;
+    line-height: 1.3em;
+    border: none;
+    border-radius: 12px;
+    box-shadow: #241c15 0 0 0 1px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0;
+    padding: 12px 24px;
+    position: relative;
+    text-align: center;
+    transition-duration: .3s;
+    transition-property: transform, box-shadow;
+    transition-timing-function: cubic-bezier(.5, 2.5, .7, .7);
 }
 
 /* Styles for button hover */
-.button:hover {
-    background-color: #2d3748;
+.cta:hover {
+    box-shadow: 0 0 0 1px #241c15, 5px 5px 0 0 #241c15;
+    transform: translate(-5px, -5px);
+}
+
+.cta:active {
+    box-shadow: 0 0 0 1px #241c15, 2.5px 2.5px 0 0 #241c15;
+    transform: translate(-2.5px, -2.5px);
+}
+
+.primary {
+    background-color: var(--primary-500);
+    color: #fff;
+}
+
+.primary:not(.cta):hover {
+    background-color: var(--primary-600);
+    color: #fff;
+}
+
+.primary:not(.cta):active {
+    background-color: var(--primary-700);
+    color: #fff;
+}
+
+.secondary {
+    background-color: var(--secondary-500);
+    color: #fff;
+}
+
+.secondary:not(.cta):hover {
+    background-color: var(--secondary-600);
+    color: #fff;
+}
+
+.secondary:not(.cta):active {
+    background-color: var(--secondary-700);
+    color: #fff;
+}
+
+.tertiary {
+    background-color: #ffffff;
+    color: #000;
+}
+
+.tertiary:not(.cta):hover {
+    background-color: #f0f0f0;
+    color: #000;
+}
+
+.tertiary:not(.cta):active {
+    background-color: #e0e0e0;
+    color: #000;
 }

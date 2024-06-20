@@ -1,12 +1,33 @@
 import styles from "./navbar.module.css";
 import Button from "@/components/button/button";
+import {getLoggedInUser} from "@/lib/getUser";
+import {useRouter} from "next/navigation";
+import {Logout} from "@/components/navbar/logout";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const user = await getLoggedInUser()
+
   return (
     <nav className={styles.navbar}>
-      <Button isLink={true} href='/'>home</Button>
-      <Button isLink={true} href='/guides'>guides</Button>
-      <Button isLink={true} href='/tournois'>tournois</Button>
+      <div className={styles.links}>
+        <Button href='/'>home</Button>
+        <Button href='/guides'>guides</Button>
+        <Button href='/tournois'>tournois</Button>
+        { !!user &&
+          <Button href='/tournois/mes-tournois'>mes tournois</Button>
+        }
+      </div>
+      <div className={styles.ctas}>
+        { !user &&
+          <>
+            <Button href='/signin' cta secondary>connexion</Button>
+            <Button href='/signup' cta tertiary>inscription</Button>
+          </>
+        }
+        { !!user &&
+          <Logout />
+        }
+      </div>
     </nav>
   );
 };

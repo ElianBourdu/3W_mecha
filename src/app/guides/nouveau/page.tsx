@@ -40,7 +40,7 @@ export default function CreateGuide() {
 
   return (
     <>
-      <div className={styles.container}>
+      <form className={styles.container}>
         <input
           className={styles.title_input}
           type="text"
@@ -62,7 +62,7 @@ export default function CreateGuide() {
             Créer le guide
           </button>
         </div>
-      </div>
+      </form>
     </>
   )
 }

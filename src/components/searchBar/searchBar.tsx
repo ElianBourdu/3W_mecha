@@ -1,6 +1,8 @@
 'use client'
 
 import {useState} from "react";
+import styles from "./searchBar.module.css";
+
 
 export default function SearchBar(props: { onChange: (value: string) => void, placeholder: string}) {
   const [searchInputValue, setSearchInputValue] = useState('')
@@ -11,7 +13,7 @@ export default function SearchBar(props: { onChange: (value: string) => void, pl
 
   return (
     <>
-      <input type="text" value={searchInputValue} onChange={handleChange} placeholder={props.placeholder}/>
+      <input className={styles.searchBar} type="text" value={searchInputValue} onChange={handleChange} placeholder={props.placeholder}/>
     </>
   )
 }

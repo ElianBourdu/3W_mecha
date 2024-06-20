@@ -2,7 +2,7 @@ import {GuideRepository} from "@/server/repositories/guide/guide_repository";
 import {NextRequest, NextResponse} from "next/server";
 import Joi from "joi";
 import {EntityAlreadyExists} from "@/server/errors/entity_already_exists";
-import {getUserFromToken} from "@/server/services/auth";
+import {getUserFromTokenAndRenew} from "@/server/services/auth";
 import {UserRepository} from "@/server/repositories/iam/user_repository";
 
 // définition du schema Joi pour une première validation des données
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 // Requête de création de Guide
 export async function POST(request: NextRequest) {
-  const user = await getUserFromToken(request.cookies.get('mechaToken')?.value)
+  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
