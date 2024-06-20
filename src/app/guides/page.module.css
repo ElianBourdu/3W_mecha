@@ -1,0 +1,31 @@
+.searchBar {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.searchBar input {
+  width: 50%;
+  padding: 10px 15px;
+  font-size: 20px;
+  outline: none;
+  border-radius: 15px;
+  border: 1px solid var(--primary-100);
+  box-shadow: 0 2px 0px 1px var(--primary-100);
+  transition: .2s ease box-shadow, .2s ease transform;
+}
+
+.searchBar input:focus {
+  outline: none;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 0px 1px var(--primary-200);
+}
+
+.guides {
+  width: var(--max-width);
+  max-width: calc(100% - 2rem);
+  margin: 5rem auto 0;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}

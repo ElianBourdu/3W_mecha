@@ -6,9 +6,18 @@ export class GuideRepository {
   // avoid any construction of the class, every method will be static
   private constructor() {}
 
-  public static async getAllGuides(): Promise<Guide[]> {
+  public static async getAllGuides({ title }: { title?: string } = {}): Promise<Guide[]> {
+    const whereClauses = []
+    const params = []
+    if (title) {
+      whereClauses.push(`title LIKE $${params.length + 1}`)
+      params.push(`%${title}%`)
+    }
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
+
     return getPool().query<IGuide>(
-      `SELECT guide__id, user__id, title, content FROM guide.guide`
+      `SELECT guide__id, user__id, title, content FROM guide.guide ${whereClause}`,
+      params
     ).then(guideList => {
       return guideList.rows.map(guide => Guide.fromObject(guide))
     })

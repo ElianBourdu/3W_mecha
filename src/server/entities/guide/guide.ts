@@ -1,3 +1,6 @@
+import {User} from "@/server/entities/iam/user";
+import {UserRepository} from "@/server/repositories/iam/user_repository";
+
 export interface IGuide {
   guide__id: string,
   user__id: string,
@@ -10,6 +13,7 @@ export class Guide implements IGuide {
   public user__id: string
   public title: string
   public content: string
+  public user?: User
 
   public static fromObject(object: IGuide): Guide {
     const guide = new Guide()
@@ -20,12 +24,13 @@ export class Guide implements IGuide {
     return guide
   }
 
-  public toJson(): Record<string, string> {
+  public toJson(): Record<string, string | object> {
     return {
       guide__id: this.guide__id,
       user__id: this.user__id,
       title: this.title,
-      content: this.content
+      content: this.content,
+      ...(this.user ? { user: this.user.toJson() } : {})
     }
   }
 }

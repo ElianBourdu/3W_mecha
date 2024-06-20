@@ -1,0 +1,7 @@
+.navbar {
+    display: flex;
+    justify-content: right;
+    gap: 2rem;
+    padding: 1rem;
+    background: var(--primary-500);
+}
