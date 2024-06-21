@@ -1,5 +1,5 @@
-import { getPool } from "@/server/db";
-import { EntityNotFoundException } from "@/server/errors/not_found";
+import {getPool} from "@/server/db";
+import {EntityNotFoundException} from "@/server/errors/not_found";
 import {ITournament, Tournament} from "@/server/entities/tournament/tournament";
 import {IUser} from "@/server/entities/iam/user";
 import {User} from "@/server/entities/iam/user";
@@ -40,24 +40,32 @@ export class TournamentRepository {
   public static async delete(tournamentId: string): Promise<void> {
     return getPool().query<ITournament & IUser>(
       `
-        DELETE FROM tournament.tournament
-        WHERE tournament__id = $1
+          DELETE
+          FROM tournament.user__tournament
+          WHERE tournament__id = $1
       `,
-      [tournamentId])
-      .then((res) => {
-        if (res.rowCount === 0) {
-          throw new EntityNotFoundException('Tournament', {id: tournamentId})
-        }
-      })
+      [tournamentId]).then((res) => {
+      return getPool().query<ITournament & IUser>(
+        `
+            DELETE
+            FROM tournament.tournament
+            WHERE tournament__id = $1
+        `,
+        [tournamentId])
+    }).then((res) => {
+      if (res.rowCount === 0) {
+        throw new EntityNotFoundException('Tournament', {id: tournamentId})
+      }
+    })
   }
 
   public static async getTournamentPlayerCount(tournamentId: string): Promise<number> {
     return getPool().query<{ count: number }>(
       `
-        SELECT count(*) as count
-        FROM tournament.user__tournament tournament_player
-            JOIN iam."user" u ON tournament_player.user__id = u.user__id
-        WHERE tournament__id = $1
+          SELECT count(*) as count
+          FROM tournament.user__tournament tournament_player
+                   JOIN iam."user" u ON tournament_player.user__id = u.user__id
+          WHERE tournament__id = $1
       `,
       [tournamentId]
     ).then((res) => {
@@ -68,10 +76,10 @@ export class TournamentRepository {
   public static async getTournamentPlayers(tournamentId: string): Promise<User[]> {
     return getPool().query<IUser>(
       `
-        SELECT tournament_player.user__id, username, steam_username, rating
-        FROM tournament.user__tournament tournament_player
-            JOIN iam."user" u ON tournament_player.user__id = u.user__id
-        WHERE tournament__id = $1
+          SELECT tournament_player.user__id, username, steam_username, rating
+          FROM tournament.user__tournament tournament_player
+                   JOIN iam."user" u ON tournament_player.user__id = u.user__id
+          WHERE tournament__id = $1
       `,
       [tournamentId]
     ).then((res) => {
@@ -102,7 +110,7 @@ export class TournamentRepository {
           FROM tournament.tournament t
                    JOIN iam."user" u ON t.owner__id = u.user__id
                    LEFT JOIN tournament.user__tournament tp ON tp.tournament__id = t.tournament__id
-          ${!includeClosed ? 'WHERE start_at > NOW()' : ''}
+              ${!includeClosed ? 'WHERE start_at > NOW()' : ''}
           GROUP BY t.tournament__id,
                    owner__id,
                    max_players,
@@ -130,8 +138,8 @@ export class TournamentRepository {
   public static async makeParticipate(tournamentId: string, userId: string): Promise<void> {
     return getPool().query(
       `
-        INSERT INTO tournament.user__tournament (tournament__id, user__id)
-        VALUES ($1, $2)
+          INSERT INTO tournament.user__tournament (tournament__id, user__id)
+          VALUES ($1, $2)
       `,
       [tournamentId, userId]
     ).then((res) => {
@@ -162,11 +170,11 @@ export class TournamentRepository {
   public static async getTournamentJoinedByPlayer(user__id: string): Promise<Tournament[]> {
     return getPool().query<ITournament & IUser>(
       `
-        SELECT t.tournament__id, owner__id, name, start_at, max_players, u.*
-        FROM tournament.tournament t
-        JOIN tournament.user__tournament ut on t.tournament__id = ut.tournament__id
-        JOIN iam."user" u ON t.owner__id = u.user__id
-        WHERE ut.user__id = $1
+          SELECT t.tournament__id, owner__id, name, start_at, max_players, u.*
+          FROM tournament.tournament t
+                   JOIN tournament.user__tournament ut on t.tournament__id = ut.tournament__id
+                   JOIN iam."user" u ON t.owner__id = u.user__id
+          WHERE ut.user__id = $1
       `, [user__id])
       .then((res) => {
         return res.rows.map((row) => {
@@ -190,29 +198,28 @@ export class TournamentRepository {
   public static async getSortedUsersVictories(tournament__id: string): Promise<UserVictoriesCount[]> {
     return getPool().query<{ victories: number } & IUser>(
       `
-          with t as (
-              select 1 as query_id, count(first_player_result) as victories, first_player__id as user__id
-              from tournament.round
-              where tournament__id = $1 and first_player_result = true
-              group by first_player__id
-              UNION
-              select 2 as query_id, count(second_player_result) as victories, second_player__id as user__id
-              from tournament.round
-              where tournament__id = $1 and second_player_result = true
-              group by second_player__id
-              UNION
-              select 3 as query_id, 0 as victories, user__id 
-              from tournament.user__tournament
-              where tournament__id = $1
-          )
-          select sum(victories) as victories, u.* 
+          with t as (select 1 as query_id, count(first_player_result) as victories, first_player__id as user__id
+                     from tournament.round
+                     where tournament__id = $1
+                       and first_player_result = true
+                     group by first_player__id
+                     UNION
+                     select 2 as query_id, count(second_player_result) as victories, second_player__id as user__id
+                     from tournament.round
+                     where tournament__id = $1
+                       and second_player_result = true
+                     group by second_player__id
+                     UNION
+                     select 3 as query_id, 0 as victories, user__id
+                     from tournament.user__tournament
+                     where tournament__id = $1)
+          select sum(victories) as victories, u.*
           from t
-          join iam."user" u on u.user__id = t.user__id
+                   join iam."user" u on u.user__id = t.user__id
           group by u.user__id
           order by victories desc
       `, [tournament__id]
     ).then((res) => {
-      console.log(res.rows)
       return res.rows.map((row) => ({
         victories: +row.victories,
         user: User.fromObject(row)

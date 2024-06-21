@@ -10,7 +10,6 @@ export default async function Signin() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const inputs = event.currentTarget.elements
-    console.log(inputs)
     login(inputs["username"].value, inputs["password"].value)
   }
 

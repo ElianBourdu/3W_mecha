@@ -2,6 +2,7 @@ import {type NextRequest, NextResponse} from 'next/server'
 import {TournamentRepository} from "@/server/repositories/tournament/tournament_repository";
 import {EntityNotFoundException} from "@/server/errors/not_found";
 import {getUserFromTokenAndRenew} from "@/server/services/auth";
+import {RoundRepository} from "@/server/repositories/tournament/round_repository";
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   return TournamentRepository.getTournamentById(params.id)
@@ -31,7 +32,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
-      return TournamentRepository.delete(params.id)
+      return RoundRepository.deleteAllRounds(params.id)
+        .then(() => TournamentRepository.delete(params.id))
         .then(() => {
           return new Response(null, { status: 204 })
         })

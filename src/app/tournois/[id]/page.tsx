@@ -5,18 +5,15 @@ import {getTournamentById, getTournamentPlayers, getTournamentResults} from "@/l
 import H1 from "@/components/titles/h1";
 import {getLoggedInUser} from "@/lib/getUser";
 import Table from "@/components/table/table";
-import Participate from "@/app/tournois/[id]/participate";
-import Button from "@/components/button/button";
-import {useRouter} from 'next/navigation'
 import {useEffect, useState} from "react";
 import {ITournament} from "@/server/entities/tournament/tournament";
 import {IUser} from "@/server/entities/iam/user";
 import {IRound} from "@/server/entities/tournament/round";
-import Countdown from '@/components/countdown/countdown'
 import {RunningAndPrerunningTournamentHeader} from "@/app/tournois/[id]/RunningAndPrerunningTournamentHeader";
+import {delete_tournament} from "@/lib/deleteTournament";
+import Button from "@/components/button/button";
 
 export default function Tournoi({ params }: {params: {id: string}}) {
-  const router =  useRouter()
   const [tournament, setTournament] = useState<ITournament>()
   const [players, setPlayers] = useState<IUser[]>([])
   const [user, setUser] = useState<IUser>()
@@ -51,7 +48,18 @@ export default function Tournoi({ params }: {params: {id: string}}) {
       })
   }, []);
 
+  function deleteTournament() {
+    delete_tournament(params.id)
+      .then(() => {
+        location.href = '/tournois'
+      })
+  }
+
   if (!tournament || !tournamentResult) return (<></>)
+
+  const deleteButton = tournament.owner__id === user?.user__id
+    ? <Button tertiary onClick={deleteTournament}>Supprimer le tournoi</Button>
+    : <></>
 
   const header = tournamentResult.status === 'running'
     ? <RunningAndPrerunningTournamentHeader
@@ -98,6 +106,9 @@ export default function Tournoi({ params }: {params: {id: string}}) {
       <H1>{ tournament.name }</H1>
       { header }
       { table }
+      <div className={styles.delete_section}>
+        { deleteButton }
+      </div>
     </div>
   )
 }

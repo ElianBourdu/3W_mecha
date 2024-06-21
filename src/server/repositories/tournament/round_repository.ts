@@ -35,6 +35,16 @@ export class RoundRepository {
     })
   }
 
+  public static async deleteAllRounds(tournament__id: string): Promise<void> {
+    return getPool().query<IRound>(
+      `
+        DELETE FROM tournament.round
+        WHERE tournament__id = $1
+      `,
+      [tournament__id]
+    ).then(() => {})
+  }
+
   public static async getCurrentRound(tournamentId: string, playerId: string, includeCheckedinRound: boolean): Promise<Round> {
     return getPool().query<IRound>(
       `

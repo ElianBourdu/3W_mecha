@@ -16,8 +16,8 @@ export default async function Auth() {
       body: JSON.stringify({username, password, steam_username}),
     })
       .then((res) => res.json())
-      .then((data) => {
-        console.log(data)
+      .then(() => {
+        location.href = '/signin'
       })
   }
 

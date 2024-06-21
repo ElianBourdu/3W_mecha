@@ -9,6 +9,16 @@ export async function GET(request: NextRequest,  { params }: { params: { id: str
     RoundRepository.getTournamentRounds(params.id)
   ]).then(([users_victories, rounds]) => {
 
+    if (users_victories.length === 0 || rounds.length === 0) {
+      return NextResponse.json({
+        data: {
+          status: 'running',
+          stages: {},
+          users_victories
+        }
+      }, { status: 200 })
+    }
+
     const is_running = users_victories[0].victories === users_victories[1].victories
 
     const stages = rounds.reduce((acc, round) => {
