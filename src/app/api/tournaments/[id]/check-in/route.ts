@@ -70,7 +70,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
             }
 
             if (error instanceof TournamentAlreadyWon) {
-              return NextResponse.json(null, { status: 204 })
+              return new Response(null, { status: 204 })
             }
 
             return NextResponse.json({ error: error.message, data: null }, { status: 404 })

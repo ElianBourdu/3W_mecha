@@ -50,15 +50,15 @@ export async function getUserFromTokenAndRenew(token: string): Promise<IUser|nul
   // vérification du token
   const payload = await verifyJWT(token).catch(() => null);
 
-  const { username, user__id, steam_username } = payload
-  const newJWT = await createJWT({ username, user__id, steam_username })
-
-  cookies().set('mechaToken', newJWT, { httpOnly: true })
-
   // si le token n'est pas valide, on renvoie une erreur 401
   if (!payload) {
     return null
   }
+
+  const { username, user__id, steam_username } = payload
+  const newJWT = await createJWT({ username, user__id, steam_username })
+
+  cookies().set('mechaToken', newJWT, { httpOnly: true })
 
   return payload
 }

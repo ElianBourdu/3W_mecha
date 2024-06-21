@@ -23,6 +23,17 @@ export class GuideRepository {
     })
   }
 
+  public static async delete(guide__id: string): Promise<void> {
+    return getPool().query(
+      `DELETE FROM guide.guide WHERE guide__id = $1`,
+      [guide__id]
+    ).then((result) => {
+      if (result.rowCount === 0) {
+        throw new EntityNotFoundException('Guide', { guide__id })
+      }
+    })
+  }
+
   public static async getGuideByTitle(title: string, isThrowing = true): Promise<Guide> {
     return getPool().query<IGuide>(
       `SELECT guide__id, user__id, title, content FROM guide.guide WHERE title = $1`,

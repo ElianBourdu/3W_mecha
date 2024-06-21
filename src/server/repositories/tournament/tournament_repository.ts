@@ -37,6 +37,20 @@ export class TournamentRepository {
       })
   }
 
+  public static async delete(tournamentId: string): Promise<void> {
+    return getPool().query<ITournament & IUser>(
+      `
+        DELETE FROM tournament.tournament
+        WHERE tournament__id = $1
+      `,
+      [tournamentId])
+      .then((res) => {
+        if (res.rowCount === 0) {
+          throw new EntityNotFoundException('Tournament', {id: tournamentId})
+        }
+      })
+  }
+
   public static async getTournamentPlayerCount(tournamentId: string): Promise<number> {
     return getPool().query<{ count: number }>(
       `

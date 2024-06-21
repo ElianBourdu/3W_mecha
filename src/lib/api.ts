@@ -10,7 +10,7 @@ class HttpError extends Error {
 export async function api<T>(route: string, options: any = {}): Promise<T> {
   return fetch(`http://localhost:3000${route}`, options)
     .then(async (res) => {
-      return res.json()
+      return (options.method === 'DELETE' ? Promise.resolve({}) : res.json())
         .then(payload => Object.assign(res, { payload }))
     })
     .then(res => {
