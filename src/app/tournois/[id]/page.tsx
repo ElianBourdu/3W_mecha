@@ -31,22 +31,22 @@ export default function Tournoi({ params }: {params: {id: string}}) {
         setTournament(tournament)
         setAlreadyStarted(new Date() > tournament.start_at)
       })
+    getLoggedInUser()
+      .then(user => setUser(user))
+    getTournamentResults(params.id)
+      .then(tournamentResult => {
+        setTournamentResult(tournamentResult)
+      })
+  }, []);
+
+  useEffect(() => {
     getTournamentPlayers(params.id)
       .then(players => {
         players.sort((a, b) => b.rating - a.rating)
         setPlayers(players)
         setAlreadyParticipate(players.map(p => p.user__id).includes(user?.user__id))
       })
-    getLoggedInUser()
-      .then(user => setUser(user))
-    getTournamentResults(params.id)
-      .then(tournamentResult => {
-        setTournamentResult(tournamentResult)
-        if (tournamentResult.status === 'done') {
-         // router.push(`/tournois/${params.id}/status`)
-        }
-      })
-  }, []);
+  }, [user]);
 
   function deleteTournament() {
     delete_tournament(params.id)

@@ -4,9 +4,9 @@ import {IUser} from "@/server/entities/iam/user";
 import {useEffect, useState} from "react";
 import {getLoggedInUser, getUser} from "@/lib/getUser";
 import {ITournament} from "@/server/entities/tournament/tournament";
-import {getTournamentById} from "@/lib/getTournaments";
+import {getTournamentById, getTournamentResults} from "@/lib/getTournaments";
 import {IRound} from "@/server/entities/tournament/round";
-import {callWinnerInRound, checkin} from "@/lib/checkin";
+import {ask_forfeit, callWinnerInRound, checkin} from "@/lib/checkin";
 import Button from "@/components/button/button";
 import styles from './page.module.css'
 
@@ -17,6 +17,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
   const [tournament, setTournament] = useState<ITournament>(null)
   const [round, setRound] = useState<IRound>(null)
   const [isStarted, setIsStarted] = useState<boolean>(false)
+  const [isFiveMinutesPassed, setIsFiveMinutesPassed] = useState<boolean>(false)
 
   function handleWinner(user) {
     return () => {
@@ -26,6 +27,26 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
         })
     }
   }
+
+  function askForfeit() {
+    ask_forfeit(tournament.tournament__id, round.round__id)
+      .then(() => {
+        location.reload()
+      })
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!round) {
+        return clearInterval(interval)
+      }
+      const isFiveMinutesPassed = round.start_at.getTime() < (new Date(Date.now() - 5 * 60 * 1000)).getTime()
+      setIsFiveMinutesPassed(isFiveMinutesPassed)
+      if (isFiveMinutesPassed) {
+        clearInterval(interval)
+      }
+    }, 1000)
+  }, [isFiveMinutesPassed, round]);
 
   useEffect(() => {
     getLoggedInUser().then(u => setUser(u))
@@ -47,10 +68,19 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
           setSecondUser(secondUser)
         })
       })
+    getTournamentResults(params.id)
+      .then(tournamentResult => {
+        if (tournamentResult.status === 'done') {
+          location.href = `/tournois/${params.id}`
+        }
+      })
   }, []);
 
   const current_user_is_first_player = round?.first_player__id === user?.user__id
   const result = current_user_is_first_player ? round?.first_player_result : round?.second_player_result
+  const askForfeitButton = isFiveMinutesPassed && !result && !isStarted
+    ? <Button cta primary onClick={askForfeit}>Ask For Forfeit</Button>
+    : <></>
 
   return (
     <div className={styles.container}>
@@ -69,6 +99,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
             {result !== null && isStarted &&
               <div> {(current_user_is_first_player ? result : !result) ? 'WINNER' : 'LOSER'} </div>
             }
+            { !current_user_is_first_player && askForfeitButton }
             {isStarted && result === null &&
               <Button cta primary onClick={handleWinner(firstUser)}>WINNER ?</Button>
             }
@@ -83,6 +114,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
             { result !== null && isStarted &&
               <div> {(current_user_is_first_player ? !result : result) ? 'WINNER' : 'LOSER'} </div>
             }
+            { current_user_is_first_player && askForfeitButton }
             { isStarted && result === null &&
               <Button cta primary onClick={handleWinner(secondUser)}>WINNER ?</Button>
             }
