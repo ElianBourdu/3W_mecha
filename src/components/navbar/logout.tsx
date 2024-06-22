@@ -2,18 +2,18 @@
 
 import Button from "@/components/button/button";
 import {useRouter} from "next/navigation";
+import {api} from "@/lib/api";
 
 export function Logout() {
   const router = useRouter()
 
   function signout() {
-    fetch('/api/auth/signout')
+    api('/api/auth/signout')
       .then((res) => {
-        if (res.ok) {
-          router.refresh()
-        } else {
-          alert('Erreur lors de la déconnexion')
-        }
+        router.refresh()
+      })
+      .catch((err) => {
+        alert(err.response.payload.message || err.response.payload.error || 'An error occurred')
       })
   }
 

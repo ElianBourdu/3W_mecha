@@ -2,6 +2,7 @@
 
 import {IUser} from "@/server/entities/iam/user";
 import {cookies} from "next/headers";
+import {api} from "@/lib/api";
 
 export async function getLoggedInUser(): Promise<IUser> {
   const cookieStore = cookies()
@@ -13,12 +14,5 @@ export async function getLoggedInUser(): Promise<IUser> {
 }
 
 export async function getUser(user__id: string): Promise<IUser> {
-  return fetch(`http://localhost:3000/api/users/${user__id}`)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error('Failed to get user ' + user__id)
-      }
-      return res.json()
-    })
-    .then(json => json.data)
+  return api<IUser>(`http://localhost:3000/api/users/${user__id}`)
 }

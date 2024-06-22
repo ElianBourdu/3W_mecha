@@ -11,8 +11,10 @@ import {createComment, getCommentsOfGuide} from "@/lib/comment";
 import {IComment} from "@/server/entities/guide/comment";
 import Input from "@/components/input/input";
 import Message from "@/app/guides/[title]/message";
+import {useRouter} from "next/navigation";
 
 export default function GuideByTitle({ params }: {params: {title: string}}) {
+  const router = useRouter()
   const [guide, setGuide] = useState<IGuide>(null)
   const [user, setUser] = useState(null)
   const [comments, setComments] = useState<IComment[]>([])
@@ -24,7 +26,7 @@ export default function GuideByTitle({ params }: {params: {title: string}}) {
     getGuideByTitle(params.title)
       .then(guide => {
         if (!guide) {
-          location.href = '/guides'
+          router.push('/guides')
         } else {
           setGuide(guide)
         }
@@ -55,7 +57,7 @@ export default function GuideByTitle({ params }: {params: {title: string}}) {
   function delete_guide() {
     deleteGuide(guide.title)
       .then(() => {
-        window.location.href = '/guides'
+        router.push('/guides')
       })
   }
 

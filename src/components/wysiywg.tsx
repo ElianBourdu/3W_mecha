@@ -1,5 +1,10 @@
-import React, { useState, useRef, useMemo } from 'react';
-import JoditEditor from 'jodit-react';
+import React, { useState, useRef } from 'react';
+import dynamic from 'next/dynamic'
+
+const JoditEditor = dynamic(
+  () => import('jodit-react'),
+  { ssr: false }
+)
 
 export default function Wysiywg({ placeholder, onChange }: { placeholder: string, onChange: (value: string) => void }) {
   const editor = useRef(null);

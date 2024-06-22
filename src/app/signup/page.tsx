@@ -2,8 +2,15 @@
 
 import styles from './page.module.css'
 import {type FormEvent} from "react";
+import Input from "@/components/input/input";
+import Button from "@/components/button/button";
+import H1 from "@/components/titles/h1";
+import {useRouter} from "next/navigation";
+import {signup} from "@/lib/auth";
+import {HttpError} from "@/lib/api";
 
-export default async function Auth() {
+export default function Auth() {
+  const router = useRouter()
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const inputs = event.currentTarget.elements
@@ -11,38 +18,25 @@ export default async function Auth() {
   }
 
   function createUser(username: string, password: string, steam_username: string) {
-    fetch('/api/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify({username, password, steam_username}),
-    })
-      .then((res) => res.json())
+    signup(username, password, steam_username)
       .then(() => {
-        location.href = '/signin'
+        router.push('/signin')
+      })
+      .catch((error: HttpError) => {
+        alert(error.response.payload.error)
       })
   }
 
   return (
-    <div className={styles.formContainer}>
+    <div className={styles.form_container}>
       <form onSubmit={handleSubmit} className={styles.form}>
-
-        <label htmlFor="username">
-          username
-          <input type="text" name="username"/>
-        </label>
-
-        <label htmlFor="steam_username">
-          steam_username
-          <input type="text" name="steam_username"/>
-        </label>
-
-        <label htmlFor="password">
-          password
-          <input type="password" name="password"/>
-        </label>
-
-        <button type="submit">
+        <H1>Inscription</H1>
+        <Input type="text" name="username" placeholder="nom d'utilisateur" />
+        <Input type="text" name="steam_username" placeholder="pseudo Steam" />
+        <Input type="password" name="password" placeholder="password" />
+        <Button cta primary type="submit">
           créer mon compte
-        </button>
+        </Button>
       </form>
     </div>
   )

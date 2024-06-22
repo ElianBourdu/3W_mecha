@@ -5,26 +5,8 @@ import {EntityNotFoundException} from "@/server/errors/not_found";
 import {MatchMaker} from "@/server/services/tournament";
 import {Round} from "@/server/entities/tournament/round";
 import {StageNotFinished} from "@/server/errors/stage_not_finished";
-import {sleep} from "@/server/util/sleep";
-import {StreamingResponse} from "@/server/util/streamingResponse";
-import {makeStream} from "@/server/util/makeStream";
 import {AlreadyGeneratingMatch} from "@/server/errors/already_generating_match";
 import {TournamentAlreadyWon} from "@/server/errors/tournament_already_won";
-
-async function *fetchUncheckedRoundByOpponant(tournament__id: string, user__id: string): AsyncGenerator<boolean> {
-  let loopCount = 0
-  // on attend au moins 3 min, après ca ne sert plus à rien d'attendre
-  while (loopCount++ < 180) {
-    await sleep(1000)
-    const round = await RoundRepository.getCurrentRound(tournament__id, user__id, true)
-    // check BDD de first_player_checkin et second_player_checkin
-    if (round.first_player__id === user__id) {
-      yield round.second_player_checkin !== null
-    } else {
-      yield round.first_player_checkin !== null
-    }
-  }
-}
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
@@ -78,23 +60,4 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       }
       return NextResponse.json({ error: error.message }, {status: 500})
     })
-}
-
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const user = await getUserFromTokenAndRenew(request.cookies.get('mechaToken')?.value)
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // variable tampon avec fetchUncheckedRoundByOpponant
-  try {
-    const generator = fetchUncheckedRoundByOpponant(params.id, user.user__id)
-    const stream = makeStream(generator)
-    return new StreamingResponse(stream)
-  } catch (error) {
-    if (error instanceof EntityNotFoundException) {
-      return NextResponse.json({error: error.message}, {status: 404})
-    }
-    return NextResponse.json({ error: error.message }, {status: 500})
-  }
 }

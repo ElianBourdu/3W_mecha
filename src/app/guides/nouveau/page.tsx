@@ -4,16 +4,7 @@ import Wysiywg from "@/components/wysiywg";
 import {useState} from "react";
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-
-async function createGuide(title: string, content: string) {
-  return fetch('/api/guides', {
-    body: JSON.stringify({ title, content }),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST'
-  })
-}
+import {createGuide} from "@/lib/createGuide";
 
 const GUIDE_CREATED = 'Le guide à bien été créer !'
 const GUIDE_FAILED = 'Le guide n\'a pas pu être créer !'
@@ -26,15 +17,14 @@ export default function CreateGuide() {
 
   function create() {
     createGuide(title, content)
-      .then((response) => {
-        if (response.status === 201) {
-          setMessage(GUIDE_CREATED)
-          setTimeout(() => {
-            router.push('/guides')
-          }, 2000)
-        } else {
-          setMessage(GUIDE_FAILED)
-        }
+      .then(() => {
+        setMessage(GUIDE_CREATED)
+        setTimeout(() => {
+          router.push('/guides')
+        }, 2000)
+      })
+      .catch(() => {
+        setMessage(GUIDE_FAILED)
       })
   }
 

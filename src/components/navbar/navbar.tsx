@@ -1,7 +1,6 @@
 import styles from "./navbar.module.css";
 import Button from "@/components/button/button";
 import {getLoggedInUser} from "@/lib/getUser";
-import {useRouter} from "next/navigation";
 import {Logout} from "@/components/navbar/logout";
 
 export default async function Navbar() {

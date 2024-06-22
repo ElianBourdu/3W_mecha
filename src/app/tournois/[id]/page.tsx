@@ -12,8 +12,10 @@ import {IRound} from "@/server/entities/tournament/round";
 import {RunningAndPrerunningTournamentHeader} from "@/app/tournois/[id]/RunningAndPrerunningTournamentHeader";
 import {delete_tournament} from "@/lib/deleteTournament";
 import Button from "@/components/button/button";
+import {useRouter} from "next/navigation";
 
 export default function Tournoi({ params }: {params: {id: string}}) {
+  const router = useRouter()
   const [tournament, setTournament] = useState<ITournament>()
   const [players, setPlayers] = useState<IUser[]>([])
   const [user, setUser] = useState<IUser>()
@@ -51,7 +53,7 @@ export default function Tournoi({ params }: {params: {id: string}}) {
   function deleteTournament() {
     delete_tournament(params.id)
       .then(() => {
-        location.href = '/tournois'
+        router.push('/tournois')
       })
   }
 

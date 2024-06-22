@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     })
     .catch((error) => {
       if (error instanceof EntityAlreadyExists) {
-        NextResponse.json({ error: 'User with this username already exists' }, { status: 400 })
+        return NextResponse.json({ error: 'User with this username already exists' }, { status: 400 })
       }
 
       if (error instanceof EntityNotFoundException) {

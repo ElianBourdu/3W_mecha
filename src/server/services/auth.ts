@@ -7,6 +7,9 @@ import {cookies} from "next/headers";
 const SALT_ROUND = +process.env.SALT_ROUND ?? 10
 const JWT_SECRET = process.env.JWT_SECRET
 
+// 3 hours
+export const JWT_MAX_AGE_S = 3 * 60 * 60
+
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined')
 }
@@ -25,7 +28,7 @@ export async function isPasswordMatchingHash(password: string, hash: string): Pr
 
 export async function createJWT(payload: Record<string, any>): Promise<string> {
   return sign(payload, JWT_SECRET, {
-    expiresIn: '3h'
+    expiresIn: JWT_MAX_AGE_S
   })
 }
 
@@ -58,7 +61,7 @@ export async function getUserFromTokenAndRenew(token: string): Promise<IUser|nul
   const { username, user__id, steam_username } = payload
   const newJWT = await createJWT({ username, user__id, steam_username })
 
-  cookies().set('mechaToken', newJWT, { httpOnly: true })
+  cookies().set('mechaToken', newJWT, { httpOnly: true, maxAge: JWT_MAX_AGE_S })
 
   return payload
 }

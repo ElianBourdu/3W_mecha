@@ -9,8 +9,10 @@ import {IRound} from "@/server/entities/tournament/round";
 import {ask_forfeit, callWinnerInRound, checkin} from "@/lib/checkin";
 import Button from "@/components/button/button";
 import styles from './page.module.css'
+import {useRouter} from "next/navigation";
 
 export default function TournamentSteps({ params }: {params: {id: string}}) {
+  const router = useRouter()
   const [user, setUser] = useState<IUser>(null)
   const [firstUser, setFirstUser] = useState<IUser>(null)
   const [secondUser, setSecondUser] = useState<IUser>(null)
@@ -71,7 +73,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
     getTournamentResults(params.id)
       .then(tournamentResult => {
         if (tournamentResult.status === 'done') {
-          location.href = `/tournois/${params.id}`
+          router.push(`/tournois/${params.id}`)
         }
       })
   }, []);

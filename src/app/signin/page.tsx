@@ -5,8 +5,10 @@ import {type FormEvent} from "react";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import H1 from "@/components/titles/h1";
+import {signin} from "@/lib/auth";
+import {HttpError} from "@/lib/api";
 
-export default async function Signin() {
+export default function Signin() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const inputs = event.currentTarget.elements
@@ -14,17 +16,13 @@ export default async function Signin() {
   }
 
   function login(username: string, password: string) {
-    fetch('/api/auth/signin', {
-      method: 'POST',
-      body: JSON.stringify({username, password}),
-    })
-      .then((res) => {
-        if (res.ok) {
-          // on utilise pas le router, pour pouvoir rafraichir la page, et donc le composant Navbar
-          window.location.href = '/'
-        } else {
-          alert('Mauvais identifiants')
-        }
+    signin(username, password)
+      .then(() => {
+        // on utilise pas le router, pour pouvoir rafraichir la page, et donc le composant Navbar
+        location.href = '/'
+      })
+      .catch((error: HttpError) => {
+        alert(error.response.payload.error)
       })
   }
 
