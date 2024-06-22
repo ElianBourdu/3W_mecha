@@ -14,5 +14,5 @@ export async function getLoggedInUser(): Promise<IUser> {
 }
 
 export async function getUser(user__id: string): Promise<IUser> {
-  return api<IUser>(`http://localhost:3000/api/users/${user__id}`)
+  return api<IUser>(`/api/users/${user__id}`)
 }
