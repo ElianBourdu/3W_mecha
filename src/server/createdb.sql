@@ -28,7 +28,7 @@ CREATE TABLE tournament.tournament (
     owner__id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     start_at TIMESTAMPTZ NOT NULL,
-    max_player SMALLINT NOT NULL,
+    max_players SMALLINT NOT NULL,
     CONSTRAINT fk_tournament_user FOREIGN KEY (owner__id) REFERENCES iam.user(user__id)
 );
 
