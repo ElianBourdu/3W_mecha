@@ -34,6 +34,23 @@ export class GuideRepository {
     })
   }
 
+  public static async getGuideById(guide__id: string, isThrowing = true): Promise<Guide> {
+    return getPool().query<IGuide>(
+      `SELECT guide__id, user__id, title, content FROM guide.guide WHERE guide__id = $1`,
+      [guide__id])
+      .then((res) => {
+        if (res.rows.length === 0) {
+          if (isThrowing) {
+            throw new EntityNotFoundException('Guide', { guide__id })
+          } else {
+            return null
+          }
+        }
+
+        return Guide.fromObject(res.rows[0])
+      })
+  }
+
   public static async getGuideByTitle(title: string, isThrowing = true): Promise<Guide> {
     return getPool().query<IGuide>(
       `SELECT guide__id, user__id, title, content FROM guide.guide WHERE title = $1`,

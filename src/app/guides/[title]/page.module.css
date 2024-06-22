@@ -9,5 +9,38 @@
 
 .delete_section {
   display: flex;
-  justify-content: flex-end;
+  gap: 1rem;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.post_comment_container {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.post_comment_container input {
+  flex: 1 0;
+}
+
+.comment_container {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--secondary-800);
+  display: flex;
+  gap: 1rem;
+}
+
+.comment {
+  flex: 1 0;
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-direction: column;
+}
+
+.comment_author {
+  font-weight: lighter;
 }

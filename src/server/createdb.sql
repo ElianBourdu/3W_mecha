@@ -69,6 +69,7 @@ CREATE TABLE guide.comment (
    user__id UUID NOT NULL,
    guide__id UUID NOT NULL,
    content BPCHAR NOT NULL,
+   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
    CONSTRAINT fk_comment_user FOREIGN KEY (user__id) REFERENCES iam.user(user__id),
    CONSTRAINT fk_comment_guide FOREIGN KEY (guide__id) REFERENCES guide.guide(guide__id)
 );
