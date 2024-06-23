@@ -38,6 +38,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
       })
   }
 
+  // show forfeit button after delay (currently 5 min)
   useEffect(() => {
     if (!round) return
     const interval = setInterval(() => {
@@ -54,8 +55,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
     getTournamentById(params.id).then(tournament => setTournament(tournament))
     checkin(params.id)
       .then(round => {
-        // if there's no round returned, it might be because matchmaking is in progress
-        console.log(round, !round)
+        // if there's no round returned, it might be because matchmaking is in progress or odd tournament behavior
         if (!round) return
 
         setRound(round)

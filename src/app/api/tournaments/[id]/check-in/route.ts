@@ -23,7 +23,6 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
   return RoundRepository.isStageFinished(params.id)
     .then((isStagesFinished) => {
-      console.log('isStagesFinished', isStagesFinished)
       // si tout les stages sont fini (ou non démarré), on lance le matchmaking
       if (isStagesFinished) {
         return startMatchMaking(params.id)
