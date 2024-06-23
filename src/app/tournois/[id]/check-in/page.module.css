@@ -26,3 +26,10 @@
   border-left: 1px solid grey;
   flex: 1 1;
 }
+
+.waiting {
+  display: flex;
+  flex: 1 0;
+  justify-content: center;
+  align-items: center;
+}

@@ -23,6 +23,13 @@ export function callWinnerInRound(tournament__id: string, round__id: string, use
       winning_user_id: user__id
     })
   })
+    .then(round => {
+      if (!round) return round
+      round.start_at = new Date(round.start_at)
+      round.first_player_checkin = round.first_player_checkin ? new Date(round.first_player_checkin) : null
+      round.second_player_checkin = round.second_player_checkin ? new Date(round.second_player_checkin) : null
+      return round
+    })
 }
 
 export function ask_forfeit(tournament__id: string, round__id: string): Promise<IRound> {

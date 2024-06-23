@@ -10,6 +10,7 @@ import {ask_forfeit, callWinnerInRound, checkin} from "@/lib/checkin";
 import Button from "@/components/button/button";
 import styles from './page.module.css'
 import {useRouter} from "next/navigation";
+import WaitingNextMatch from "@/app/tournois/[id]/check-in/waitingNextMatch";
 
 export default function TournamentSteps({ params }: {params: {id: string}}) {
   const router = useRouter()
@@ -38,10 +39,8 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
   }
 
   useEffect(() => {
+    if (!round) return
     const interval = setInterval(() => {
-      if (!round) {
-        return clearInterval(interval)
-      }
       const isFiveMinutesPassed = round.start_at.getTime() < (new Date(Date.now() - 5 * 60 * 1000)).getTime()
       setIsFiveMinutesPassed(isFiveMinutesPassed)
       if (isFiveMinutesPassed) {
@@ -56,6 +55,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
     checkin(params.id)
       .then(round => {
         // if there's no round returned, it might be because matchmaking is in progress
+        console.log(round, !round)
         if (!round) return
 
         setRound(round)
@@ -70,6 +70,7 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
           setSecondUser(secondUser)
         })
       })
+      .catch(() => {})
     getTournamentResults(params.id)
       .then(tournamentResult => {
         if (tournamentResult.status === 'done') {
@@ -78,8 +79,13 @@ export default function TournamentSteps({ params }: {params: {id: string}}) {
       })
   }, []);
 
+  if (!round) {
+    return <WaitingNextMatch />
+  }
+
   const current_user_is_first_player = round?.first_player__id === user?.user__id
   const result = current_user_is_first_player ? round?.first_player_result : round?.second_player_result
+
   const askForfeitButton = isFiveMinutesPassed && !result && !isStarted
     ? <Button cta primary onClick={askForfeit}>Ask For Forfeit</Button>
     : <></>

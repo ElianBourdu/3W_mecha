@@ -198,26 +198,50 @@ export class TournamentRepository {
   public static async getSortedUsersVictories(tournament__id: string): Promise<UserVictoriesCount[]> {
     return getPool().query<{ victories: number } & IUser>(
       `
-          with t as (select 1 as query_id, count(first_player_result) as victories, first_player__id as user__id
-                     from tournament.round
-                     where tournament__id = $1
-                       and first_player_result = true
-                     group by first_player__id
-                     UNION
-                     select 2 as query_id, count(second_player_result) as victories, second_player__id as user__id
-                     from tournament.round
-                     where tournament__id = $1
-                       and second_player_result = true
-                     group by second_player__id
-                     UNION
-                     select 3 as query_id, 0 as victories, user__id
-                     from tournament.user__tournament
-                     where tournament__id = $1)
-          select sum(victories) as victories, u.*
-          from t
-                   join iam."user" u on u.user__id = t.user__id
-          group by u.user__id
-          order by victories desc
+        WITH
+          -- get the number of victories for first players in rounds
+          first_player_query AS (SELECT count(first_player_result) AS victories, first_player__id AS user__id
+                                FROM tournament.round
+                                WHERE tournament__id = $1
+                                  AND first_player_result = true
+                                GROUP BY first_player__id),
+          -- get the number of victories for second players in rounds
+          second_player_query AS (SELECT count(second_player_result) AS victories, second_player__id AS user__id
+                                 FROM tournament.round
+                                 WHERE tournament__id = $1
+                                   AND second_player_result = true
+                                 GROUP BY second_player__id),
+          -- get the max stage of the tournament (aka the number of rounds per player)
+          max_stage_query AS (SELECT max(stage) AS max
+                             FROM tournament.round
+                             WHERE tournament__id = $1
+                             GROUP BY tournament__id),
+          -- add victories for players that didn't play a round
+          default_victories_query AS (SELECT
+                                       (SELECT max FROM max_stage_query) - (count(r1.*) + count(r2.*)) AS victories,
+                                       user__id
+                                     FROM tournament.user__tournament ut
+                                       LEFT JOIN tournament.round r1
+                                         ON user__id = r1.first_player__id AND ut.tournament__id = r1.tournament__id
+                                       LEFT JOIN tournament.round r2
+                                         ON user__id = r2.second_player__id AND ut.tournament__id = r2.tournament__id
+                                     WHERE ut.tournament__id = $1
+                                     GROUP BY user__id),
+          -- union all the queries
+          t AS (SELECT 1 as query_id, victories, user__id
+               FROM first_player_query
+               UNION
+               SELECT 2 AS query_id, victories, user__id
+               FROM second_player_query
+               UNION
+               SELECT 3 AS query_id, victories, user__id
+               FROM default_victories_query)
+        -- sum the victories for each player
+        SELECT sum(victories) as victories, u.*
+        FROM t
+          JOIN iam."user" u ON u.user__id = t.user__id
+        GROUP BY u.user__id
+        ORDER BY victories DESC
       `, [tournament__id]
     ).then((res) => {
       return res.rows.map((row) => ({

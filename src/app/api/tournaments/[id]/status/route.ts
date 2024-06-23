@@ -2,14 +2,21 @@ import {NextRequest, NextResponse} from "next/server";
 import {TournamentRepository} from "@/server/repositories/tournament/tournament_repository";
 import {RoundRepository} from "@/server/repositories/tournament/round_repository";
 import {Round} from "@/server/entities/tournament/round";
+import {getPlayersVictoriesAndDefeats, getRoundsByStages} from "@/server/services/tournament";
+import {User} from "@/server/entities/iam/user";
 
 export async function GET(request: NextRequest,  { params }: { params: { id: string } }) {
   return Promise.all([
-    TournamentRepository.getSortedUsersVictories(params.id),
-    RoundRepository.getTournamentRounds(params.id)
-  ]).then(([users_victories, rounds]) => {
+    RoundRepository.getTournamentRounds(params.id),
+    TournamentRepository.getTournamentPlayers(params.id)
+  ]).then(([rounds, players]) => {
+    const users_victories = getPlayersVictoriesAndDefeats(rounds)
+    const userById = players.reduce((acc, player) => {
+      acc[player.user__id] = player
+      return acc
+    }, {} as Record<string, User>)
 
-    if (users_victories.length === 0 || rounds.length === 0) {
+    if (rounds.length === 0 || users_victories.length === 0) {
       return NextResponse.json({
         data: {
           status: 'running',
@@ -19,19 +26,25 @@ export async function GET(request: NextRequest,  { params }: { params: { id: str
       }, { status: 200 })
     }
 
-    const is_running = users_victories[0].victories === users_victories[1].victories
+    const max_stage = Math.max(...rounds.map(round => round.stage))
 
-    const stages = rounds.reduce((acc, round) => {
-      acc[round.stage] = (acc[round.stage] ?? [])
-      acc[round.stage].push(round)
-      return acc
-    }, {} as Record<number, Round[]>)
+    const userWithVictories = users_victories
+      // ajout des victoires par défaut pour les joueurs n'ayant pas joué tout les rounds
+      .map(user => ({
+        victories: user.victories + (max_stage - (user.victories + user.defeats)),
+        user: userById[user.user__id]
+      }))
+      // tri des joueurs par nombre de victoires
+      .sort((a, b) => b.victories - a.victories)
+
+    const is_running = userWithVictories[0].victories === userWithVictories[1].victories
+    const stages = getRoundsByStages(rounds)
 
     return NextResponse.json({
       data: {
         status: is_running ? 'running' : 'done',
         stages,
-        users_victories
+        users_victories: userWithVictories
       }
     }, { status: 200 })
   })

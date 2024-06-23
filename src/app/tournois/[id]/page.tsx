@@ -59,6 +59,8 @@ export default function Tournoi({ params }: {params: {id: string}}) {
 
   if (!tournament || !tournamentResult) return (<></>)
 
+  console.log(tournamentResult)
+
   const deleteButton = tournament.owner__id === user?.user__id
     ? <Button tertiary onClick={deleteTournament}>Supprimer le tournoi</Button>
     : <></>

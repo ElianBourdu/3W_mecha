@@ -21,11 +21,34 @@ export class RoundRepository {
     })
   }
 
+  public static async isStageFinished(tournamentId: string): Promise<boolean> {
+    return getPool().query<{ count_finished: number, count_all: number }>(
+      `
+        SELECT (
+           SELECT count(*)
+           FROM tournament.round
+           WHERE tournament__id = $1
+             AND first_player_result IS NOT NULL
+             AND second_player_result IS NOT NULL
+        ) as count_finished, (
+           SELECT count(*)
+           FROM tournament.round
+           WHERE tournament__id = $1
+        ) as count_all
+      `,
+      [tournamentId]
+    ).then((res) => {
+      return res.rows[0].count_finished === res.rows[0].count_all
+    })
+  }
+
   public static async getTournamentRounds(tournamentId: string): Promise<Round[]> {
     return getPool().query<IRound>(
       `
         SELECT round__id, tournament__id, stage, start_at, first_player__id, first_player_checkin, first_player_result, second_player__id, second_player_checkin, second_player_result
+        
         FROM tournament.round
+        
         WHERE tournament__id = $1
         ORDER BY stage
       `,
@@ -79,7 +102,9 @@ export class RoundRepository {
           CASE WHEN round.second_player__id = $1 AND round.second_player_checkin IS NULL
               THEN current_timestamp 
           ELSE second_player_checkin END
-      WHERE (first_player__id = $1 OR second_player__id = $1) AND tournament__id = $2 
+      WHERE (first_player__id = $1 OR second_player__id = $1)
+        AND tournament__id = $2
+        AND stage = (SELECT MAX(stage) FROM tournament.round WHERE tournament__id = $2)
       RETURNING *
       `,[user__id, tournament__id]
     ).then((res) => {
