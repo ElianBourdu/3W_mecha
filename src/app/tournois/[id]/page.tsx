@@ -67,8 +67,7 @@ export default function Tournoi({ params }: {params: {id: string}}) {
     ? <RunningAndPrerunningTournamentHeader
       tournament={tournament}
       alreadyStarted={alreadyStarted}
-      alreadyParticipate={alreadyParticipate}
-      user={user}
+      canParticipate={!!user && !alreadyParticipate && !alreadyStarted && players.length < tournament.max_players}
     />
     : <></>
 
